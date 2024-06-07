@@ -7,6 +7,7 @@ import csv
 import pandas as pd
 import datetime
 import time
+from pathlib import Path
 
 # Setting page config
 st.set_page_config(page_title="Keboola Data Editor", page_icon=":robot:", layout="wide")
@@ -408,8 +409,11 @@ elif st.session_state['upload-tables']:
                 else:
                     # Save the uploaded file to a temporary path
                     temp_file_path = f"/tmp/{uploaded_file.name}"
-                    with open(temp_file_path, "wb") as f:
-                        f.write(uploaded_file.getbuffer())
+                    if Path(uploaded_file.name).suffix == '.csv':
+                        df=pd.read_csv(uploaded_file)
+                    else:
+                        df=pd.read_excel(uploaded_file)
+                    df.to_csv(temp_file_path, index=False)
 
                     # Create the table in the selected bucket
                     try:
