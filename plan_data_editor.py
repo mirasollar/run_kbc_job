@@ -427,10 +427,11 @@ elif st.session_state['upload-tables']:
                             st.session_state['upload-tables'] = False
                             st.session_state['selected-table'] = None
                             # st.session_state['selected-table'] = selected_bucket+"."+table_name
-                            time.sleep(3)
+                            time.sleep(4)
                         st.success('File uploaded and table created successfully!', icon = "🎉")
+                        st.cache_data.clear()
                         st.session_state["tables_id"] = fetch_all_ids()
-                        time.sleep(3)
+                        time.sleep(4)
                         st.rerun()
 
                     except Exception as e:
