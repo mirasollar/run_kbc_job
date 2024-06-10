@@ -292,11 +292,11 @@ if st.session_state['selected-table'] is None and (st.session_state['upload-tabl
         filtered_df = st.session_state["tables_id"]
     
     # Třídění dat
-    if sort_option == "By Name":
+    if sort_option == "Sort By Name":
         filtered_df = filtered_df.sort_values(by="displayName", ascending=True)
-    elif sort_option == "By Date Created":
+    elif sort_option == "Sort By Date Created":
         filtered_df = filtered_df.sort_values(by="created", ascending=True)
-    elif sort_option == "By Date Updated":
+    elif sort_option == "Sort By Date Updated":
         filtered_df = filtered_df.sort_values(by="lastImportDate", ascending=True)
 
     # Looping through each row of the Tables ID
