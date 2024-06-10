@@ -295,9 +295,9 @@ if st.session_state['selected-table'] is None and (st.session_state['upload-tabl
     if sort_option == "Sort By Name":
         filtered_df = filtered_df.sort_values(by="displayName", ascending=True)
     elif sort_option == "Sort By Date Created":
-        filtered_df = filtered_df.sort_values(by="created", ascending=True)
+        filtered_df = filtered_df.sort_values(by="created", ascending=False)
     elif sort_option == "Sort By Date Updated":
-        filtered_df = filtered_df.sort_values(by="lastImportDate", ascending=True)
+        filtered_df = filtered_df.sort_values(by="lastImportDate", ascending=False)
 
     # Looping through each row of the Tables ID
     for index, row in filtered_df.iterrows():
