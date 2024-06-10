@@ -304,7 +304,7 @@ if st.session_state['selected-table'] is None and (st.session_state['upload-tabl
         display_table_section(row)
         # row['displayName'], row['table_id'],row['lastImportDate'],row['created']
 
-elif st.session_state['selected-table']is not None and (st.session_state['upload-tables'] is None or st.session_state['upload-tables'] != False):
+elif st.session_state['selected-table']is not None:
     col1,col2,col4= st.columns((2,7,2))
     with col1:
         st.button(":gray[:arrow_left: Back to Tables]", on_click=resetSetting, type="secondary")
@@ -426,7 +426,8 @@ elif st.session_state['upload-tables']:
                         with st.spinner('Uploading...'):
                             st.session_state["tables_id"] = fetch_all_ids()
                             st.session_state['upload-tables'] = False
-                            st.session_state['selected-table'] = selected_bucket+"."+table_name
+                            st.session_state['selected-table'] = None
+                            # st.session_state['selected-table'] = selected_bucket+"."+table_name
                             time.sleep(3)
                         st.success('File uploaded and table created successfully!', icon = "🎉")
                         time.sleep(3)
