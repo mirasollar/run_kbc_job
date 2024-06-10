@@ -92,7 +92,8 @@ def update_session_state(table_id):
 
 def display_table_card(row):
     card(
-        title=row["displayName"].upper(),
+        title=row["displayName"],
+        # title=row["displayName"].upper(),   
         text=[f"Primary key: {row['primaryKey']}", f"Table ID: {row['table_id']}", f"Updated at: {row['lastImportDate']}", f"Created at: {row['created']}", f"Rows count: {str(row['rowsCount'])}"],
         styles={
             "card": {
