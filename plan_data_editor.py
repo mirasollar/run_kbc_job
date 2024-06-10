@@ -417,13 +417,13 @@ elif st.session_state['upload-tables']:
 
                     # Create the table in the selected bucket
                     try:
-                        client.tables.create(
+                        with st.spinner('Uploading...'):
+                            client.tables.create(
                             name=table_name,
                             bucket_id=selected_bucket,
                             file_path=temp_file_path,
                             primary_key=[]
-                        )
-                        with st.spinner('Uploading...'):
+                            )
                             st.session_state['upload-tables'] = False
                             st.session_state['selected-table'] = None
                             # st.session_state['selected-table'] = selected_bucket+"."+table_name
