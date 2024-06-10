@@ -8,6 +8,7 @@ import pandas as pd
 import datetime
 import time
 from pathlib import Path
+import re
 
 # Setting page config
 st.set_page_config(page_title="Keboola Data Editor", page_icon=":robot:", layout="wide")
@@ -401,42 +402,47 @@ elif st.session_state['upload-tables']:
         # Upload button
         if st.button('Upload'):
             if selected_bucket and uploaded_file and table_name:
-                # Check if the table name already exists in the selected bucket
-                existing_tables = client.buckets.list_tables(bucket_id=selected_bucket)
-                existing_table_names = [table['name'] for table in existing_tables]
-
-                if table_name in existing_table_names:
-                    st.error(f"Error: Table name '{table_name}' already exists in the selected bucket.")
+                string_check = '^[\w-]*$'
+                # check a valid table name
+                if bool(re.match(string_check, table_name)) == False:
+                    st.error('Error: In a table name are allowed only alphanumeric characters, dashes, and underscores.')
                 else:
-                    # Save the uploaded file to a temporary path
-                    temp_file_path = f"/tmp/{uploaded_file.name}"
-                    if Path(uploaded_file.name).suffix == '.csv':
-                        df=pd.read_csv(uploaded_file)
+                    # Check if the table name already exists in the selected bucket
+                    existing_tables = client.buckets.list_tables(bucket_id=selected_bucket)
+                    existing_table_names = [table['name'] for table in existing_tables]
+
+                    if table_name in existing_table_names:
+                        st.error(f"Error: Table name '{table_name}' already exists in the selected bucket.")
                     else:
-                        df=pd.read_excel(uploaded_file)
-                    df.to_csv(temp_file_path, index=False)
+                        # Save the uploaded file to a temporary path
+                        temp_file_path = f"/tmp/{uploaded_file.name}"
+                        if Path(uploaded_file.name).suffix == '.csv':
+                            df=pd.read_csv(uploaded_file)
+                        else:
+                            df=pd.read_excel(uploaded_file)
+                        df.to_csv(temp_file_path, index=False)
 
-                    # Create the table in the selected bucket
-                    try:
-                        with st.spinner('Uploading...'):
-                            client.tables.create(
-                            name=table_name,
-                            bucket_id=selected_bucket,
-                            file_path=temp_file_path,
-                            primary_key=[]
-                            )
-                            st.session_state['upload-tables'] = False
-                            st.session_state['selected-table'] = None
-                            # st.session_state['selected-table'] = selected_bucket+"."+table_name
+                        # Create the table in the selected bucket
+                        try:
+                            with st.spinner('Uploading...'):
+                                client.tables.create(
+                                name=table_name,
+                                bucket_id=selected_bucket,
+                                file_path=temp_file_path,
+                                primary_key=[]
+                                )
+                                st.session_state['upload-tables'] = False
+                                st.session_state['selected-table'] = None
+                                # st.session_state['selected-table'] = selected_bucket+"."+table_name
+                                time.sleep(4)
+                            st.success('File uploaded and table created successfully!', icon = "🎉")
+                            st.cache_data.clear()
+                            st.session_state["tables_id"] = fetch_all_ids()
                             time.sleep(4)
-                        st.success('File uploaded and table created successfully!', icon = "🎉")
-                        st.cache_data.clear()
-                        st.session_state["tables_id"] = fetch_all_ids()
-                        time.sleep(4)
-                        st.rerun()
+                            st.rerun()
 
-                    except Exception as e:
-                        st.error(f"Error: {str(e)}")
+                        except Exception as e:
+                            st.error(f"Error: {str(e)}")
             else:
                 st.error('Error: Please select a bucket, upload a file, and enter a table name. Please check if you have permission to create a new bucket and table.')
 
