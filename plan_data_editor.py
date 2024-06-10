@@ -304,7 +304,7 @@ if st.session_state['selected-table'] is None and (st.session_state['upload-tabl
         display_table_section(row)
         # row['displayName'], row['table_id'],row['lastImportDate'],row['created']
 
-elif st.session_state['selected-table']is not None:
+elif st.session_state['selected-table']is not None and (st.session_state['upload-tables'] is None or st.session_state['upload-tables'] != False):
     col1,col2,col4= st.columns((2,7,2))
     with col1:
         st.button(":gray[:arrow_left: Back to Tables]", on_click=resetSetting, type="secondary")
@@ -360,7 +360,7 @@ elif st.session_state['selected-table']is not None:
         st.success('Data Updated!', icon = "🎉")
 
     ChangeButtonColour('Save Data', '#FFFFFF', '#1EC71E','#1EC71E')
-elif st.session_state['upload-tables'] and (st.session_state['upload-tables'] is None or st.session_state['upload-tables'] != False):
+elif st.session_state['upload-tables']:
     if st.button(":gray[:arrow_left: Go back]", on_click=on_click_back):
         pass
     st.title('Import Data into :blue[Keboola Storage]')
