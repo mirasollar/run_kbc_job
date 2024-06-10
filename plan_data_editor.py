@@ -360,7 +360,7 @@ elif st.session_state['selected-table']is not None:
         st.success('Data Updated!', icon = "🎉")
 
     ChangeButtonColour('Save Data', '#FFFFFF', '#1EC71E','#1EC71E')
-elif st.session_state['upload-tables']:
+elif st.session_state['upload-tables'] and (st.session_state['upload-tables'] is None or st.session_state['upload-tables'] != False):
     if st.button(":gray[:arrow_left: Go back]", on_click=on_click_back):
         pass
     st.title('Import Data into :blue[Keboola Storage]')
