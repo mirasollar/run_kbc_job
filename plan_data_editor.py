@@ -424,12 +424,12 @@ elif st.session_state['upload-tables']:
                             primary_key=[]
                         )
                         with st.spinner('Uploading...'):
-                            st.session_state["tables_id"] = fetch_all_ids()
                             st.session_state['upload-tables'] = False
                             st.session_state['selected-table'] = None
                             # st.session_state['selected-table'] = selected_bucket+"."+table_name
                             time.sleep(3)
                         st.success('File uploaded and table created successfully!', icon = "🎉")
+                        st.session_state["tables_id"] = fetch_all_ids()
                         time.sleep(3)
                         st.rerun()
 
