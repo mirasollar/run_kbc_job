@@ -511,19 +511,21 @@ elif st.session_state['upload-tables']:
     st.title('Import Data into :blue[Keboola Storage]')
     # List and display available buckets
     buckets = client.buckets.list()
-    bucket_names = [bucket['id'] for bucket in buckets]
-    
+    # bucket_names = [bucket['id'] for bucket in buckets]
     bucket_names = ["Choose a bucket"]  # Add option to choose a bucket at the beginning
     bucket_names.extend([bucket['id'] for bucket in buckets])
-    
     selected_bucket = st.selectbox('Choose a bucket', bucket_names, placeholder="Choose an option")
 
     if selected_bucket and selected_bucket != "Choose an option":
         # File uploader
         uploaded_file = st.file_uploader("Upload a file", type=['csv', 'xlsx'])
 
-        # Input for table name
-        table_name = st.text_input("Enter table name")
+        # List and display available tables
+        tables = client.tables.list()
+        table_names = ["Choose a table"]  # Add option to choose a table at the beginning
+        table_names.extend([table["id"] for table in tables if re.search(f"^{selected_bucket}\.", table["id"])])
+        table_name = st.selectbox('Choose a table', table_names, placeholder="Choose an option")
+        # table_name = st.text_input("Enter table name")
 
         # Hlavní tlačítko pro nějakou akci
         if 'action_clicked' not in st.session_state:
