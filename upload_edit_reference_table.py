@@ -353,10 +353,10 @@ def check_duplicates(df_to_check, duplicity_setting = []):
     df_to_check = df_to_check.astype(str)
     if duplicity_setting:
         df_to_check = df_to_check[duplicity_setting]
+    df_to_check = df_to_check.applymap(lambda s: s.lower() if type(s) == str else s)
     duplicity_value = len(df_to_check.duplicated().unique().tolist())
     return duplicity_value
         
-
 # Display tables
 init()
 st.session_state["tables_id"] = fetch_all_ids()
