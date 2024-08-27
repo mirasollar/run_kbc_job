@@ -523,7 +523,7 @@ elif st.session_state['upload-tables']:
         # List and display available tables
         tables = client.tables.list()
         table_names = ["Choose a table"]  # Add option to choose a table at the beginning
-        table_names.extend([table["id"] for table in tables if re.search(f"^{selected_bucket}\.", table["id"])])
+        table_names.extend([re.sub('.*\.', '', table["id"]) for table in tables if re.search(f"^{bucket_name}\.", table["id"])])
         table_name = st.selectbox('Choose a table', table_names, placeholder="Choose an option")
         # table_name = st.text_input("Enter table name")
 
