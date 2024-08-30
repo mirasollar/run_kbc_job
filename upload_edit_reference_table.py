@@ -516,7 +516,7 @@ elif st.session_state['upload-tables']:
     bucket_names.extend([bucket['id'] for bucket in buckets])
     selected_bucket = st.selectbox('Choose a bucket', bucket_names, placeholder="Choose an option")
 
-    if selected_bucket and selected_bucket != "Choose an option":
+    if selected_bucket and selected_bucket != "Choose a bucket":
         # File uploader
         uploaded_file = st.file_uploader("Upload a file", type=['csv', 'xlsx'])
 
@@ -527,7 +527,7 @@ elif st.session_state['upload-tables']:
         table_name = st.selectbox('Choose a table', table_names, placeholder="Choose an option")
         # table_name = st.text_input("Enter table name")
 
-        # Hlavní tlačítko pro nějakou akci
+        # Main button for an action
         if 'action_clicked' not in st.session_state:
             st.session_state.action_clicked = False
 
@@ -536,16 +536,16 @@ elif st.session_state['upload-tables']:
             st.session_state.action_clicked = True
 
         if st.session_state.action_clicked:
-            if selected_bucket != "Choose a bucket" and uploaded_file and table_name:
-                string_check = '^[a-zA-Z-_\d]*$'
+            if selected_bucket != "Choose a bucket" and uploaded_file and table_name == "Choose a table":
+                st.error('Error: Please select a table name.')
+                # string_check = '^[a-zA-Z-_\d]*$'
                 # check a valid table name
-                if bool(re.match(string_check, table_name)) == False:
-                    st.error('Error: In a table name are allowed only alphanumeric characters without diacritical marks, dashes, and underscores.')
-                else:
+                # if bool(re.match(string_check, table_name)) == False:
+                #    st.error('Error: In a table name are allowed only alphanumeric characters without diacritical marks, dashes, and underscores.')
+                if selected_bucket != "Choose a bucket" and uploaded_file and table_name != "Choose a table":
                     # Check if the table name already exists in the selected bucket
                     existing_tables = client.buckets.list_tables(bucket_id=selected_bucket)
                     existing_table_names = [table['name'] for table in existing_tables]
-
                     if table_name in existing_table_names:
                         st.warning(f"Please check the table name again. The table '{table_name}' will be completely overwritten by your file!", icon="⚠️")
                         if st.button('I know what I am doing...'):
@@ -610,7 +610,7 @@ elif st.session_state['upload-tables']:
                             st.write("Waiting for a confirmation...")
                     else:
                         st.error("It is not allowed to create new tables. You need to overwrite the existing one. If you want to create a new table, contact the data team.")
-            else:
-                st.error('Error: Please select a bucket, upload a file and enter a table name.')    
+            # else:
+            #    st.error('Error: Please select a bucket, upload a file and select a table name.')    
 
 display_footer_section()
