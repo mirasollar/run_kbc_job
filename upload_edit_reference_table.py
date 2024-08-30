@@ -536,81 +536,79 @@ elif st.session_state['upload-tables']:
             st.session_state.action_clicked = True
 
         if st.session_state.action_clicked:
-            if selected_bucket != "Choose a bucket" and uploaded_file and table_name == "Choose a table":
-                st.error('Error: Please select a table name.')
+            if selected_bucket != "Choose a bucket" and uploaded_file and table_name != "Choose a table":
                 # string_check = '^[a-zA-Z-_\d]*$'
                 # check a valid table name
                 # if bool(re.match(string_check, table_name)) == False:
                 #    st.error('Error: In a table name are allowed only alphanumeric characters without diacritical marks, dashes, and underscores.')
-                if selected_bucket != "Choose a bucket" and uploaded_file and table_name != "Choose a table":
-                    # Check if the table name already exists in the selected bucket
-                    existing_tables = client.buckets.list_tables(bucket_id=selected_bucket)
-                    existing_table_names = [table['name'] for table in existing_tables]
-                    if table_name in existing_table_names:
-                        st.warning(f"Please check the table name again. The table '{table_name}' will be completely overwritten by your file!", icon="⚠️")
-                        if st.button('I know what I am doing...'):
-                            table_id = selected_bucket + '.' + table_name
-                            # show column formatting settings
-                            column_setting = get_setting(token, selected_bucket, table_id)[0]
-                            # st.write(f"Required column setting: {column_setting}")
-                            format_setting = split_dict(column_setting, 2)
-                            # st.write(f"Required column formatting: {format_setting}")
-                            null_cells_setting = split_dict(column_setting, 1)
-                            # st.write(f"Required not null cells setting: {null_cells_setting}")
-                            dupl_setting = get_setting(token, selected_bucket, table_id)[1]
-                            # st.write(f"Required duplicity setting: {dupl_setting}")
+                # Check if the table name already exists in the selected bucket
+                existing_tables = client.buckets.list_tables(bucket_id=selected_bucket)
+                existing_table_names = [table['name'] for table in existing_tables]
+                if table_name in existing_table_names:
+                    st.warning(f"Please check the table name again. The table '{table_name}' will be completely overwritten by your file!", icon="⚠️")
+                    if st.button('I know what I am doing...'):
+                        table_id = selected_bucket + '.' + table_name
+                        # show column formatting settings
+                        column_setting = get_setting(token, selected_bucket, table_id)[0]
+                        # st.write(f"Required column setting: {column_setting}")
+                        format_setting = split_dict(column_setting, 2)
+                        # st.write(f"Required column formatting: {format_setting}")
+                        null_cells_setting = split_dict(column_setting, 1)
+                        # st.write(f"Required not null cells setting: {null_cells_setting}")
+                        dupl_setting = get_setting(token, selected_bucket, table_id)[1]
+                        # st.write(f"Required duplicity setting: {dupl_setting}")
 
-                            st.success('The action has been confirmed successfully!', icon = "🎉")
-                            # Resetování stavu
-                            st.session_state.action_clicked = False
-                            if st.session_state.action_clicked == False:
-                                # Save the uploaded file to a temporary path
-                                temp_file_path = f"/tmp/{uploaded_file.name}"
-                                if Path(uploaded_file.name).suffix == '.csv':
-                                    df=pd.read_csv(uploaded_file, sep=None, engine='python', encoding='utf-8-sig')
-                                else:
-                                    df=pd.read_excel(uploaded_file)
-                                missing_columns = check_columns_diff(get_setting(token, selected_bucket, table_id)[2], df.columns.values.tolist())[0]
-                                extra_columns = check_columns_diff(get_setting(token, selected_bucket, table_id)[2], df.columns.values.tolist())[1]
-                                # st.write(f"Columns in dataframe: {df.columns.values.tolist()}")
-                                if missing_columns:
-                                    st.error(f"Some columns are missing in the file. Affected columns: {', '.join(missing_columns)}. The column names are case-sensitive. Please edit it before proceeding.")
-                                elif extra_columns:
-                                    st.error(f"There are extra columns. Adding new columns is not allowed. Affected columns: {', '.join(extra_columns)}. The column names are case-sensitive. If you want to add new columns, please contact the data team.")
-                                elif check_null_rows(df):
-                                    st.error("The file contains null rows. Please remove them before proceeding.")
-                                elif check_col_types(df, format_setting):
-                                    st.error(f"The file contains data in the wrong format. Affected columns: {', '.join(check_col_types(df, format_setting))}. Please edit it before proceeding.")
-                                elif check_date_format(df, format_setting):
-                                    st.error(f"The file contains date in the wrong format. Affected columns: {', '.join(check_date_format(df, format_setting))}. Please edit it before proceeding.")
-                                elif check_null_cells(df, null_cells_setting):
-                                    st.error(f"The file contains data with null values. Affected columns: {', '.join(check_null_cells(df, null_cells_setting))}. Please edit it before proceeding.")
-                                elif dupl_setting and check_duplicates(df, dupl_setting) == 2:
-                                    st.error(f"The table contains columns with duplicate values. Affected columns: {', '.join(dupl_setting)}. Please edit it before proceeding.")
-                                elif check_duplicates(df) == 2:
-                                    st.error("The table contains duplicate rows. Please remove them before proceeding.")
-                                else:                               
-                                    df.to_csv(temp_file_path, index=False)
-                                    try:
-                                        with st.spinner('Uploading...'):
-                                            client.tables.load(table_id=table_id, file_path=temp_file_path, is_incremental=False)
-                                            st.session_state['upload-tables'] = False
-                                            st.session_state['selected-table'] = None
-                                            # st.session_state['selected-table'] = selected_bucket+"."+table_name
-                                            time.sleep(2)
-                                        st.success('File uploaded and table created successfully!', icon = "🎉")
-                                        st.cache_data.clear()
-                                        st.session_state["tables_id"] = fetch_all_ids()
+                        st.success('The action has been confirmed successfully!', icon = "🎉")
+                        # Resetování stavu
+                        st.session_state.action_clicked = False
+                        if st.session_state.action_clicked == False:
+                            # Save the uploaded file to a temporary path
+                            temp_file_path = f"/tmp/{uploaded_file.name}"
+                            if Path(uploaded_file.name).suffix == '.csv':
+                                df=pd.read_csv(uploaded_file, sep=None, engine='python', encoding='utf-8-sig')
+                            else:
+                                df=pd.read_excel(uploaded_file)
+                            missing_columns = check_columns_diff(get_setting(token, selected_bucket, table_id)[2], df.columns.values.tolist())[0]
+                            extra_columns = check_columns_diff(get_setting(token, selected_bucket, table_id)[2], df.columns.values.tolist())[1]
+                            # st.write(f"Columns in dataframe: {df.columns.values.tolist()}")
+                            if missing_columns:
+                                st.error(f"Some columns are missing in the file. Affected columns: {', '.join(missing_columns)}. The column names are case-sensitive. Please edit it before proceeding.")
+                            elif extra_columns:
+                                st.error(f"There are extra columns. Adding new columns is not allowed. Affected columns: {', '.join(extra_columns)}. The column names are case-sensitive. If you want to add new columns, please contact the data team.")
+                            elif check_null_rows(df):
+                                st.error("The file contains null rows. Please remove them before proceeding.")
+                            elif check_col_types(df, format_setting):
+                                st.error(f"The file contains data in the wrong format. Affected columns: {', '.join(check_col_types(df, format_setting))}. Please edit it before proceeding.")
+                            elif check_date_format(df, format_setting):
+                                st.error(f"The file contains date in the wrong format. Affected columns: {', '.join(check_date_format(df, format_setting))}. Please edit it before proceeding.")
+                            elif check_null_cells(df, null_cells_setting):
+                                st.error(f"The file contains data with null values. Affected columns: {', '.join(check_null_cells(df, null_cells_setting))}. Please edit it before proceeding.")
+                            elif dupl_setting and check_duplicates(df, dupl_setting) == 2:
+                                st.error(f"The table contains columns with duplicate values. Affected columns: {', '.join(dupl_setting)}. Please edit it before proceeding.")
+                            elif check_duplicates(df) == 2:
+                                st.error("The table contains duplicate rows. Please remove them before proceeding.")
+                            else:                               
+                                df.to_csv(temp_file_path, index=False)
+                                try:
+                                    with st.spinner('Uploading...'):
+                                        client.tables.load(table_id=table_id, file_path=temp_file_path, is_incremental=False)
+                                        st.session_state['upload-tables'] = False
+                                        st.session_state['selected-table'] = None
+                                        # st.session_state['selected-table'] = selected_bucket+"."+table_name
                                         time.sleep(2)
-                                        st.rerun()
+                                    st.success('File uploaded and table created successfully!', icon = "🎉")
+                                    st.cache_data.clear()
+                                    st.session_state["tables_id"] = fetch_all_ids()
+                                    time.sleep(2)
+                                    st.rerun()
 
-                                    except Exception as e:
-                                        st.error(f"Error: {str(e)}")
-                        else:
-                            st.write("Waiting for a confirmation...")
+                                except Exception as e:
+                                    st.error(f"Error: {str(e)}")
                     else:
-                        st.error("It is not allowed to create new tables. You need to overwrite the existing one. If you want to create a new table, contact the data team.")
-            # else:
-            #    st.error('Error: Please select a bucket, upload a file and select a table name.')    
+                        st.write("Waiting for a confirmation...")
+                else:
+                    st.error("It is not allowed to create new tables. You need to overwrite the existing one. If you want to create a new table, contact the data team.")
+            else:
+                st.error('Error: Please select a table name.') 
 
 display_footer_section()
