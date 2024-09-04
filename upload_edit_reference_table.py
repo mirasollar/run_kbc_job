@@ -609,6 +609,6 @@ elif st.session_state['upload-tables']:
                 else:
                     st.error("It is not allowed to create new tables. You need to overwrite the existing one. If you want to create a new table, contact the data team.")
             else:
-                st.error('Error: Please select a table name.') 
+                st.error('Error: Please upload a file and select a table name.') 
 
 display_footer_section()
