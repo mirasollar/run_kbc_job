@@ -299,11 +299,11 @@ def check_col_types(df_to_check, col_setting):
     return wrong_columns
 
 def check_date_format(df_to_check, col_setting):
-    
+    st.write(f"Before edit: {df_to_check}")
     df_to_check = df_to_check.replace(r'^(\s*|None|none|NONE|NaN|nan|Null|null|NULL|n\/a|N\/A)$', np.nan, regex=True)
     df_to_check = df_to_check.astype(str)
     st.write(df_to_check.dtypes)
-    st.write(df_to_check)
+    st.write(f"After edit: {df_to_check}")
     col_names = df_to_check.columns.values.tolist()
     date_setting = {k: v for k, v in col_setting.items() if re.search("%", v)}
     col_names_to_check = list(set(col_names).intersection(list(date_setting.keys())))
