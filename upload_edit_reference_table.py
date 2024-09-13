@@ -299,8 +299,8 @@ def check_col_types(df_to_check, col_setting):
     return wrong_columns
 
 def check_date_format(df_to_check, col_setting):
-    df_to_check = df_to_check.replace(r'^(\s*|None|none|NaN|nan|null|n\/a|N\/A)$', np.nan, regex=True)
     df_to_check = df_to_check.astype(str)
+    df_to_check = df_to_check.replace(r'^(\s*|None|none|NONE|NaN|nan|Null|null|NULL|n\/a|N\/A|<NA>)$', np.nan, regex=True)
     st.write(df_to_check.dtypes)
     st.write(df_to_check)
     col_names = df_to_check.columns.values.tolist()
@@ -312,7 +312,7 @@ def check_date_format(df_to_check, col_setting):
             if k == i:
                 value_in_date_col = df_to_check[i].tolist()
                 for j in value_in_date_col:
-                    if not re.search("nan|None", j):
+                    if not re.search("nan|None|<NA>", j):
                         try:
                             datetime.datetime.strptime(j, v).strftime(v)
                         except:
@@ -344,7 +344,7 @@ def check_null_cells(df_to_check, col_setting):
     col_names = df_to_check.columns.values.tolist()
     col_names_to_check = list(set(col_names).intersection(list(col_setting.keys())))
     for i in col_names_to_check:
-        if [x for x in df_to_check[i].tolist() if re.search("nan|None|<NA>", x)]:
+        if [x for x in df_to_check[i].tolist() if re.search("nan|None", x)]:
             wrong_cols.append(i)
     return wrong_cols
 
