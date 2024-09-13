@@ -471,9 +471,8 @@ elif st.session_state['selected-table']is not None:
     if st.button("Save Data", key="save-data-tables"):
         with st.spinner('Saving Data...'):
             edited_data = cast_columns(edited_data)
-            
+            st.write(edited_data)
             edited_data = delete_null_rows(edited_data)
-            # st.write(edited_data)
             table_id = selected_row['table_id']
             table_id_split = table_id.split('.')
             selected_bucket = table_id_split[0] + '.' + table_id_split[1]
