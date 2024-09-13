@@ -299,8 +299,9 @@ def check_col_types(df_to_check, col_setting):
     return wrong_columns
 
 def check_date_format(df_to_check, col_setting):
+    
+    df_to_check = df_to_check.replace(r'^(\s*|None|none|NONE|NaN|nan|Null|null|NULL|n\/a|N\/A)$', np.nan, regex=True)
     df_to_check = df_to_check.astype(str)
-    df_to_check = df_to_check.replace(r'^(\s*|None|none|NONE|NaN|nan|Null|null|NULL|n\/a|N\/A|<NA>)$', np.nan, regex=True)
     st.write(df_to_check.dtypes)
     st.write(df_to_check)
     col_names = df_to_check.columns.values.tolist()
