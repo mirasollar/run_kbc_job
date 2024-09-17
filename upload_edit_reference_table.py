@@ -298,12 +298,15 @@ def check_col_types(df_to_check, col_setting):
     wrong_columns = [k for k in col_types_dict if col_types_dict[k] != col_setting.get(k)]
     return wrong_columns
 
+def modifying_nas(df_for_editing):
+    st.write(f"Before edit: {df_for_editing}")
+    df_for_editing = df_for_editing.replace(r'^(\s*|None|none|NONE|NaN|nan|Null|null|NULL|n\/a|N\/A)$', np.nan, regex=True)
+    mod_df = df_for_editing.astype(str)
+    st.write(mod_df.dtypes)
+    st.write(f"After edit: {mod_df}")
+    return mod_df
+
 def check_date_format(df_to_check, col_setting):
-    st.write(f"Before edit: {df_to_check}")
-    df_to_check = df_to_check.replace(r'^(\s*|None|none|NONE|NaN|nan|Null|null|NULL|n\/a|N\/A)$', np.nan, regex=True)
-    df_to_check = df_to_check.astype(str)
-    st.write(df_to_check.dtypes)
-    st.write(f"After edit: {df_to_check}")
     col_names = df_to_check.columns.values.tolist()
     date_setting = {k: v for k, v in col_setting.items() if re.search("%", v)}
     col_names_to_check = list(set(col_names).intersection(list(date_setting.keys())))
@@ -474,6 +477,7 @@ elif st.session_state['selected-table']is not None:
             edited_data = cast_columns(edited_data)
             st.write(edited_data)
             edited_data = delete_null_rows(edited_data)
+            edited_data_nan = modifying_nas(edited_data)
             table_id = selected_row['table_id']
             table_id_split = table_id.split('.')
             selected_bucket = table_id_split[0] + '.' + table_id_split[1]
@@ -487,8 +491,8 @@ elif st.session_state['selected-table']is not None:
             dupl_setting = get_setting(token, selected_bucket, table_id)[1]
             # st.write(f"Required duplicity setting: {dupl_setting}")
 
-            if check_date_format(edited_data, format_setting):
-                st.error(f"The table contains date in the wrong format. Affected columns: {', '.join(check_date_format(edited_data, format_setting))}. Please edit it before proceeding.")
+            if check_date_format(edited_data_nan, format_setting):
+                st.error(f"The table contains date in the wrong format. Affected columns: {', '.join(check_date_format(edited_data_nan, format_setting))}. Please edit it before proceeding.")
             elif check_null_cells(edited_data, null_cells_setting):
                 st.error(f"The table contains data with null values. Affected columns: {', '.join(check_null_cells(edited_data, null_cells_setting))}. Please edit it before proceeding.")
             elif dupl_setting and check_duplicates(edited_data, dupl_setting) == 2:
