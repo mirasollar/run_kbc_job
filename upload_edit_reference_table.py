@@ -496,10 +496,10 @@ elif st.session_state['selected-table']is not None:
 
             if date_setting:
                 checking_date = check_date_format(edited_data_nan, date_setting)
-                    if checking_date[0]:
-                        st.error(f"The file contains date in the wrong format. Affected columns: {', '.join(checking_date[0])}. Please edit it before proceeding.")
-                    else:
-                        edited_data_nan = checking_date[1]
+                if checking_date[0]:
+                    st.error(f"The file contains date in the wrong format. Affected columns: {', '.join(checking_date[0])}. Please edit it before proceeding.")
+                else:
+                    edited_data_nan = checking_date[1]
             elif check_null_cells(edited_data_nan, null_cells_setting):
                 st.error(f"The table contains data with null values. Affected columns: {', '.join(check_null_cells(edited_data, null_cells_setting))}. Please edit it before proceeding.")
             elif dupl_setting and check_duplicates(edited_data_nan, dupl_setting) == 2:
@@ -595,11 +595,11 @@ elif st.session_state['upload-tables']:
                             elif check_col_types(df, format_setting):
                                 st.error(f"The file contains data in the wrong format. Affected columns: {', '.join(check_col_types(df, format_setting))}. Please edit it before proceeding.")
                             elif date_setting:
-                                    checking_date = check_date_format(df, date_setting)
-                                    if checking_date[0]:
-                                        st.error(f"The file contains date in the wrong format. Affected columns: {', '.join(checking_date[0])}. Please edit it before proceeding.")
-                                    else:
-                                        df = checking_date[1]          
+                                checking_date = check_date_format(df, date_setting)
+                                if checking_date[0]:
+                                    st.error(f"The file contains date in the wrong format. Affected columns: {', '.join(checking_date[0])}. Please edit it before proceeding.")
+                                else:
+                                    df = checking_date[1]          
                             elif check_null_cells(df, null_cells_setting):
                                 st.error(f"The file contains data with null values. Affected columns: {', '.join(check_null_cells(df, null_cells_setting))}. Please edit it before proceeding.")
                             elif dupl_setting and check_duplicates(df, dupl_setting) == 2:
