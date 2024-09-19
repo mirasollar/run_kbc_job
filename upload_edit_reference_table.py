@@ -584,9 +584,13 @@ elif st.session_state['upload-tables']:
                                 df=pd.read_csv(uploaded_file, sep=None, engine='python', encoding='utf-8-sig')
                             else:
                                 df=pd.read_excel(uploaded_file)
+                            if date_setting:
+                                checking_date = check_date_format(modifying_nas(df), date_setting)
+                                st.write(f"Checking date: {checking_date[0]}, {checking_date[1]}")
+                        
                             missing_columns = check_columns_diff(get_setting(token, selected_bucket, table_id)[2], df.columns.values.tolist())[0]
                             extra_columns = check_columns_diff(get_setting(token, selected_bucket, table_id)[2], df.columns.values.tolist())[1]
-                            df_nan = modifying_nas(df)
+
                             # st.write(f"Columns in dataframe: {df.columns.values.tolist()}")
                             if missing_columns:
                                 st.error(f"Some columns are missing in the file. Affected columns: {', '.join(missing_columns)}. The column names are case-sensitive. Please edit it before proceeding.")
@@ -596,19 +600,19 @@ elif st.session_state['upload-tables']:
                                 st.error("The file contains null rows. Please remove them before proceeding.")
                             elif check_col_types(df, format_setting):
                                 st.error(f"The file contains data in the wrong format. Affected columns: {', '.join(check_col_types(df, format_setting))}. Please edit it before proceeding.")
-                            elif date_setting:
-                                checking_date = check_date_format(df_nan, date_setting)
-                                if checking_date[0]:
-                                    st.error(f"The file contains date in the wrong format. Affected columns: {', '.join(checking_date[0])}. Please edit it before proceeding.")
-                                else:
-                                    df = checking_date[1]          
+                            elif date_setting and checking_date[0]:
+                                st.error(f"The file contains date in the wrong format. Affected columns: {', '.join(checking_date[0])}. Please edit it before proceeding.")         
                             elif check_null_cells(df, null_cells_setting):
                                 st.error(f"The file contains data with null values. Affected columns: {', '.join(check_null_cells(df, null_cells_setting))}. Please edit it before proceeding.")
                             elif dupl_setting and check_duplicates(df, dupl_setting) == 2:
                                 st.error(f"The table contains columns with duplicate values. Affected columns: {', '.join(dupl_setting)}. Please edit it before proceeding.")
                             elif check_duplicates(df) == 2:
                                 st.error("The table contains duplicate rows. Please remove them before proceeding.")
-                            else:                               
+                            else:
+                                if date_setting:
+                                    df = checking_date[1]
+                                else:
+                                    pass
                                 df.to_csv(temp_file_path, index=False)
                                 try:
                                     with st.spinner('Uploading...'):
