@@ -274,6 +274,10 @@ def split_dict(setting_dict, n):
         modified_dict = {k:v for k,v in d.items() if v != 'ignore'}
     return modified_dict
 
+def date_setting(column_setting_dict):
+    date_setting = {k: v for k, v in column_setting_dict.items() if re.search("%", v)}
+    return date_setting
+
 def check_null_rows(df_to_check):
     col_names = df_to_check.columns.values.tolist()
     all_col_null_check = df_to_check[col_names].isnull().apply(lambda x: all(x), axis=1)
@@ -306,22 +310,19 @@ def modifying_nas(df_for_editing):
     st.write(f"After edit: {mod_df}")
     return mod_df
 
-def check_date_format(df_to_check, col_setting):
+def check_date_format(df_to_check, date_setting_dict):
     col_names = df_to_check.columns.values.tolist()
-    date_setting = {k: v for k, v in col_setting.items() if re.search("%", v)}
-    col_names_to_check = list(set(col_names).intersection(list(date_setting.keys())))
+    col_names_to_check = list(set(col_names).intersection(list(date_setting_dict.keys())))
     wrong_cols = []
-    for k, v in date_setting.items():
-        for i in col_names_to_check:
-            if k == i:
-                value_in_date_col = df_to_check[i].tolist()
-                for j in value_in_date_col:
-                    if not re.search("nan|None|<NA>", j):
-                        try:
-                            datetime.datetime.strptime(j, v).strftime(v)
-                        except:
-                            wrong_cols.append(k)
-    return list(set(wrong_cols))
+    for k, v in date_setting_dict.items():
+        for col_name in col_names_to_check:
+            if k == col_name:
+                try:
+                    df_to_check[col_name] = pd.to_datetime(df_to_check[col_name], format=v.split(",")[0])
+                    df_to_check[col_name] = df_to_check[col_name].dt.strftime(v.split(",")[0])
+                except:
+                    wrong_cols.append(k)
+    return wrong_cols, df_to_check
 
 def delete_null_rows(df_for_editing):
     col_names = df_for_editing.columns.values.tolist()
@@ -490,21 +491,28 @@ elif st.session_state['selected-table']is not None:
             # st.write(f"Required not null cells setting: {null_cells_setting}")
             dupl_setting = get_setting(token, selected_bucket, table_id)[1]
             # st.write(f"Required duplicity setting: {dupl_setting}")
+            date_setting = date_setting(column_setting)
+            st.write(f"Required date setting: {date_setting}")
 
-            if check_date_format(edited_data_nan, format_setting):
-                st.error(f"The table contains date in the wrong format. Affected columns: {', '.join(check_date_format(edited_data_nan, format_setting))}. Please edit it before proceeding.")
-            elif check_null_cells(edited_data, null_cells_setting):
+            if date_setting:
+                checking_date = check_date_format(edited_data_nan, date_setting)
+                    if checking_date[0]:
+                        st.error(f"The file contains date in the wrong format. Affected columns: {', '.join(checking_date[0])}. Please edit it before proceeding.")
+                    else:
+                        edited_data_nan = checking_date[1]
+            elif check_null_cells(edited_data_nan, null_cells_setting):
                 st.error(f"The table contains data with null values. Affected columns: {', '.join(check_null_cells(edited_data, null_cells_setting))}. Please edit it before proceeding.")
-            elif dupl_setting and check_duplicates(edited_data, dupl_setting) == 2:
+            elif dupl_setting and check_duplicates(edited_data_nan, dupl_setting) == 2:
                 st.error(f"The table contains columns with duplicate values. Affected columns: {', '.join(dupl_setting)}. Please edit it before proceeding.")
-            elif check_duplicates(edited_data) == 2:
+            elif check_duplicates(edited_data_nan) == 2:
                 st.error("The table contains duplicate rows. Please remove them before proceeding.")
-            else:                               
+            else:                            
+                
                 # st.write(f"Table ID: {selected_row['table_id']}")
-                # st.write(edited_data)
-                st.session_state["data"] = edited_data
+                # st.write(edited_data_nan)
+                st.session_state["data"] = edited_data_nan
                 # is_incremental = bool(selected_row.get('primaryKey', False))   
-                write_to_keboola(edited_data, st.session_state["selected-table"],f'updated_data.csv.gz', False)
+                write_to_keboola(edited_data_nan, st.session_state["selected-table"],f'updated_data.csv.gz', False)
                 st.success('Data Updated!', icon = "🎉")
                 st.cache_data.clear()
 
@@ -561,6 +569,8 @@ elif st.session_state['upload-tables']:
                         # st.write(f"Required not null cells setting: {null_cells_setting}")
                         dupl_setting = get_setting(token, selected_bucket, table_id)[1]
                         # st.write(f"Required duplicity setting: {dupl_setting}")
+                        date_setting = date_setting(column_setting)
+                        st.write(f"Required date setting: {date_setting}")
 
                         st.success('The action has been confirmed successfully!', icon = "🎉")
                         # Resetování stavu
@@ -574,6 +584,7 @@ elif st.session_state['upload-tables']:
                                 df=pd.read_excel(uploaded_file)
                             missing_columns = check_columns_diff(get_setting(token, selected_bucket, table_id)[2], df.columns.values.tolist())[0]
                             extra_columns = check_columns_diff(get_setting(token, selected_bucket, table_id)[2], df.columns.values.tolist())[1]
+                            df = modifying_nas(df)
                             # st.write(f"Columns in dataframe: {df.columns.values.tolist()}")
                             if missing_columns:
                                 st.error(f"Some columns are missing in the file. Affected columns: {', '.join(missing_columns)}. The column names are case-sensitive. Please edit it before proceeding.")
@@ -583,8 +594,12 @@ elif st.session_state['upload-tables']:
                                 st.error("The file contains null rows. Please remove them before proceeding.")
                             elif check_col_types(df, format_setting):
                                 st.error(f"The file contains data in the wrong format. Affected columns: {', '.join(check_col_types(df, format_setting))}. Please edit it before proceeding.")
-                            elif check_date_format(df, format_setting):
-                                st.error(f"The file contains date in the wrong format. Affected columns: {', '.join(check_date_format(df, format_setting))}. Please edit it before proceeding.")
+                            elif date_setting:
+                                    checking_date = check_date_format(df, date_setting)
+                                    if checking_date[0]:
+                                        st.error(f"The file contains date in the wrong format. Affected columns: {', '.join(checking_date[0])}. Please edit it before proceeding.")
+                                    else:
+                                        df = checking_date[1]          
                             elif check_null_cells(df, null_cells_setting):
                                 st.error(f"The file contains data with null values. Affected columns: {', '.join(check_null_cells(df, null_cells_setting))}. Please edit it before proceeding.")
                             elif dupl_setting and check_duplicates(df, dupl_setting) == 2:
