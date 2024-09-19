@@ -499,20 +499,19 @@ elif st.session_state['selected-table']is not None:
                 if checking_date[0]:
                     st.error(f"The file contains date in the wrong format. Affected columns: {', '.join(checking_date[0])}. Please edit it before proceeding.")
                 else:
-                    edited_data_nan = checking_date[1]
-            elif check_null_cells(edited_data_nan, null_cells_setting):
+                    edited_data = checking_date[1]
+            elif check_null_cells(edited_data, null_cells_setting):
                 st.error(f"The table contains data with null values. Affected columns: {', '.join(check_null_cells(edited_data, null_cells_setting))}. Please edit it before proceeding.")
-            elif dupl_setting and check_duplicates(edited_data_nan, dupl_setting) == 2:
+            elif dupl_setting and check_duplicates(edited_data, dupl_setting) == 2:
                 st.error(f"The table contains columns with duplicate values. Affected columns: {', '.join(dupl_setting)}. Please edit it before proceeding.")
-            elif check_duplicates(edited_data_nan) == 2:
+            elif check_duplicates(edited_data) == 2:
                 st.error("The table contains duplicate rows. Please remove them before proceeding.")
             else:                            
-                
                 # st.write(f"Table ID: {selected_row['table_id']}")
-                # st.write(edited_data_nan)
-                st.session_state["data"] = edited_data_nan
+                # st.write(edited_data)
+                st.session_state["data"] = edited_data
                 # is_incremental = bool(selected_row.get('primaryKey', False))   
-                write_to_keboola(edited_data_nan, st.session_state["selected-table"],f'updated_data.csv.gz', False)
+                write_to_keboola(edited_data, st.session_state["selected-table"],f'updated_data.csv.gz', False)
                 st.success('Data Updated!', icon = "🎉")
                 st.cache_data.clear()
 
@@ -584,7 +583,7 @@ elif st.session_state['upload-tables']:
                                 df=pd.read_excel(uploaded_file)
                             missing_columns = check_columns_diff(get_setting(token, selected_bucket, table_id)[2], df.columns.values.tolist())[0]
                             extra_columns = check_columns_diff(get_setting(token, selected_bucket, table_id)[2], df.columns.values.tolist())[1]
-                            df = modifying_nas(df)
+                            df_nan = modifying_nas(df)
                             # st.write(f"Columns in dataframe: {df.columns.values.tolist()}")
                             if missing_columns:
                                 st.error(f"Some columns are missing in the file. Affected columns: {', '.join(missing_columns)}. The column names are case-sensitive. Please edit it before proceeding.")
@@ -595,7 +594,7 @@ elif st.session_state['upload-tables']:
                             elif check_col_types(df, format_setting):
                                 st.error(f"The file contains data in the wrong format. Affected columns: {', '.join(check_col_types(df, format_setting))}. Please edit it before proceeding.")
                             elif date_setting:
-                                checking_date = check_date_format(df, date_setting)
+                                checking_date = check_date_format(df_nan, date_setting)
                                 if checking_date[0]:
                                     st.error(f"The file contains date in the wrong format. Affected columns: {', '.join(checking_date[0])}. Please edit it before proceeding.")
                                 else:
