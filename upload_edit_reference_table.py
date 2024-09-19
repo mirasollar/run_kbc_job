@@ -495,9 +495,9 @@ elif st.session_state['selected-table']is not None:
             st.write(f"Required date setting: {date_setting}")
             if date_setting:
                 checking_date = check_date_format(edited_data_nan, date_setting)
-            st.write(f"Checking date: {checking_date[0]}, {checking_date[1]}")
+                st.write(f"Checking date: {checking_date[0]}, {checking_date[1]}")
                 
-            if checking_date[0]:
+            if date_setting and checking_date[0]:
                 st.error(f"The file contains date in the wrong format. Affected columns: {', '.join(checking_date[0])}. Please edit it before proceeding.")
             elif check_null_cells(edited_data, null_cells_setting):
                 st.error(f"The table contains data with null values. Affected columns: {', '.join(check_null_cells(edited_data, null_cells_setting))}. Please edit it before proceeding.")
@@ -508,7 +508,7 @@ elif st.session_state['selected-table']is not None:
             else:                            
                 # st.write(f"Table ID: {selected_row['table_id']}")
                 # st.write(edited_data)
-                if checking_date[1]:
+                if date_setting:
                     st.session_state["data"] = checking_date[1]
                     edited_data = checking_date[1]
                 else:
