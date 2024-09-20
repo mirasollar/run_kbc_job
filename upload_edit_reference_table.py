@@ -343,13 +343,13 @@ def delete_null_rows(df_for_editing):
     return df_for_editing
 
 def check_null_cells(df_to_check, col_setting):
-    df_to_check = df_to_check.replace(r'^(\s*|None|none|NaN|nan|null|n\/a|N\/A)$', np.nan, regex=True)
+    # df_to_check = df_to_check.replace(r'^(\s*|None|none|NaN|nan|null|n\/a|N\/A)$', np.nan, regex=True)
     df_to_check = df_to_check.astype(str)
     wrong_cols = []
     col_names = df_to_check.columns.values.tolist()
     col_names_to_check = list(set(col_names).intersection(list(col_setting.keys())))
     for i in col_names_to_check:
-        if [x for x in df_to_check[i].tolist() if re.search("nan|None", x)]:
+        if [x for x in df_to_check[i].tolist() if re.search("^$", x)]:
             wrong_cols.append(i)
     return wrong_cols
 
@@ -602,8 +602,8 @@ elif st.session_state['upload-tables']:
                                 st.error(f"The file contains data in the wrong format. Affected columns: {', '.join(check_col_types(df, format_setting))}. Please edit it before proceeding.")
                             elif date_setting and checking_date[0]:
                                 st.error(f"The file contains date in the wrong format. Affected columns: {', '.join(checking_date[0])}. Please edit it before proceeding.")         
-                            elif check_null_cells(df, null_cells_setting):
-                                st.error(f"The file contains data with null values. Affected columns: {', '.join(check_null_cells(df, null_cells_setting))}. Please edit it before proceeding.")
+                            elif check_null_cells(modifying_nas(df), null_cells_setting):
+                                st.error(f"The file contains data with null values. Affected columns: {', '.join(check_null_cells(modifying_nas(df), null_cells_setting))}. Please edit it before proceeding.")
                             elif dupl_setting and check_duplicates(df, dupl_setting) == 2:
                                 st.error(f"The table contains columns with duplicate values. Affected columns: {', '.join(dupl_setting)}. Please edit it before proceeding.")
                             elif check_duplicates(df) == 2:
