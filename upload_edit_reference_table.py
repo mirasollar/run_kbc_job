@@ -305,7 +305,7 @@ def check_col_types(df_to_check, col_setting):
 def modifying_nas(df_for_editing):
     st.write(f"Before edit: {df_for_editing}")
     # df_for_editing = df_for_editing.astype(str)
-    mod_df = df_for_editing.replace(r'^(\s*|None|none|NONE|NaN|nan|Null|null|NULL|n\/a|N\/A)$', '', regex=True)
+    mod_df = df_for_editing.replace(r'^(\s*|None|none|NONE|NaN|nan|Null|null|NULL|n\/a|N\/A|<NA>)$', np.nan, regex=True)
     st.write(f"After edit: {mod_df}")
     return mod_df
 
@@ -349,7 +349,7 @@ def check_null_cells(df_to_check, col_setting):
     col_names = df_to_check.columns.values.tolist()
     col_names_to_check = list(set(col_names).intersection(list(col_setting.keys())))
     for i in col_names_to_check:
-        if [x for x in df_to_check[i].tolist() if re.search("NaN", x)]:
+        if [x for x in df_to_check[i].tolist() if re.search("nan|None|<NA>", x)]:
             wrong_cols.append(i)
     return wrong_cols
 
