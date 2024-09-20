@@ -303,10 +303,8 @@ def check_col_types(df_to_check, col_setting):
     return wrong_columns
 
 def modifying_nas(df_for_editing):
-    st.write(f"Before edit: {df_for_editing}")
     # df_for_editing = df_for_editing.astype(str)
     mod_df = df_for_editing.replace(r'^(\s*|None|none|NONE|NaN|nan|Null|null|NULL|n\/a|N\/A|<NA>)$', np.nan, regex=True)
-    st.write(f"After edit: {mod_df}")
     return mod_df
 
 def check_date_format(df_to_check, date_setting_dict):
@@ -331,7 +329,6 @@ def delete_null_rows(df_for_editing):
     for col in col_names:
         if df_for_editing[col].dropna().isin([True, False]).all():
             bool_columns.append(col)
-    st.write(f"Bool columns: {bool_columns}")
     df_without_bool = df_for_editing.drop(columns=bool_columns)
     col_names_without_bool = df_without_bool.columns.values.tolist()
     all_col_null_check = df_without_bool[col_names_without_bool].isnull().apply(lambda x: all(x), axis=1)
@@ -476,7 +473,7 @@ elif st.session_state['selected-table']is not None:
     if st.button("Save Data", key="save-data-tables"):
         with st.spinner('Saving Data...'):
             edited_data = cast_columns(edited_data)
-            st.write(edited_data)
+            # st.write(edited_data)
             edited_data = delete_null_rows(modifying_nas(edited_data))
             
             table_id = selected_row['table_id']
@@ -492,11 +489,9 @@ elif st.session_state['selected-table']is not None:
             dupl_setting = get_setting(token, selected_bucket, table_id)[1]
             # st.write(f"Required duplicity setting: {dupl_setting}")
             date_setting = date_setting(column_setting)
-            st.write(f"Required date setting: {date_setting}")
+            # st.write(f"Required date setting: {date_setting}")
             if date_setting:
                 checking_date = check_date_format(edited_data, date_setting)
-                st.write(f"Checking date: {checking_date[0]}, {checking_date[1]}")
-                
             if date_setting and checking_date[0]:
                 st.error(f"The file contains date in the wrong format. Affected columns: {', '.join(checking_date[0])}. Please edit it before proceeding.")
             elif check_null_cells(edited_data, null_cells_setting):
@@ -506,8 +501,6 @@ elif st.session_state['selected-table']is not None:
             elif check_duplicates(edited_data) == 2:
                 st.error("The table contains duplicate rows. Please remove them before proceeding.")
             else:                            
-                # st.write(f"Table ID: {selected_row['table_id']}")
-                # st.write(edited_data)
                 if date_setting:
                     st.session_state["data"] = checking_date[1]
                     edited_data = checking_date[1]
@@ -572,7 +565,7 @@ elif st.session_state['upload-tables']:
                         dupl_setting = get_setting(token, selected_bucket, table_id)[1]
                         # st.write(f"Required duplicity setting: {dupl_setting}")
                         date_setting = date_setting(column_setting)
-                        st.write(f"Required date setting: {date_setting}")
+                        # st.write(f"Required date setting: {date_setting}")
 
                         st.success('The action has been confirmed successfully!', icon = "🎉")
                         # Resetování stavu
@@ -586,7 +579,6 @@ elif st.session_state['upload-tables']:
                                 df=pd.read_excel(uploaded_file)
                             if date_setting:
                                 checking_date = check_date_format(modifying_nas(df), date_setting)
-                                st.write(f"Checking date: {checking_date[0]}, {checking_date[1]}")
                         
                             missing_columns = check_columns_diff(get_setting(token, selected_bucket, table_id)[2], df.columns.values.tolist())[0]
                             extra_columns = check_columns_diff(get_setting(token, selected_bucket, table_id)[2], df.columns.values.tolist())[1]
