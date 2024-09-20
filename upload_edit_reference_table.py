@@ -354,7 +354,7 @@ def check_null_cells(df_to_check, col_setting):
     return wrong_cols
 
 def check_duplicates(df_to_check, duplicity_setting = []):
-    df_to_check = df_to_check.replace(r'^(\s*|None|none|NaN|nan|null|n\/a|N\/A)$', np.nan, regex=True)
+    # df_to_check = df_to_check.replace(r'^(\s*|None|none|NaN|nan|null|n\/a|N\/A)$', np.nan, regex=True)
     df_to_check = df_to_check.astype(str)
     if duplicity_setting:
         df_to_check = df_to_check[duplicity_setting]
@@ -596,7 +596,7 @@ elif st.session_state['upload-tables']:
                                 st.error(f"Some columns are missing in the file. Affected columns: {', '.join(missing_columns)}. The column names are case-sensitive. Please edit it before proceeding.")
                             elif extra_columns:
                                 st.error(f"There are extra columns. Adding new columns is not allowed. Affected columns: {', '.join(extra_columns)}. The column names are case-sensitive. If you want to add new columns, please contact the data team.")
-                            elif check_null_rows(df):
+                            elif check_null_rows(modifying_nas(df)):
                                 st.error("The file contains null rows. Please remove them before proceeding.")
                             elif check_col_types(df, format_setting):
                                 st.error(f"The file contains data in the wrong format. Affected columns: {', '.join(check_col_types(df, format_setting))}. Please edit it before proceeding.")
