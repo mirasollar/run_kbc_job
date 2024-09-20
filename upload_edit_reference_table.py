@@ -304,7 +304,7 @@ def check_col_types(df_to_check, col_setting):
 
 def modifying_nas(df_for_editing):
     st.write(f"Before edit: {df_for_editing}")
-    df_for_editing = df_for_editing.astype(str)
+    # df_for_editing = df_for_editing.astype(str)
     mod_df = df_for_editing.replace(r'^(\s*|None|none|NONE|NaN|nan|Null|null|NULL|n\/a|N\/A)$', '', regex=True)
     st.write(f"After edit: {mod_df}")
     return mod_df
