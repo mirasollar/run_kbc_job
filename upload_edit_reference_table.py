@@ -325,7 +325,7 @@ def check_date_format(df_to_check, date_setting_dict):
 
 def delete_null_rows(df_for_editing):
     col_names = df_for_editing.columns.values.tolist()
-    df_for_editing = df_for_editing.replace(r'^(\s*|None|none|NONE|NaN|nan|null|n\/a|N\/A)$', np.nan, regex=True)
+    # df_for_editing = df_for_editing.replace(r'^(\s*|None|none|NONE|NaN|nan|null|n\/a|N\/A)$', np.nan, regex=True)
     df_for_editing.reset_index(drop=True, inplace=True)
     bool_columns = []
     for col in col_names:
@@ -476,8 +476,8 @@ elif st.session_state['selected-table']is not None:
         with st.spinner('Saving Data...'):
             edited_data = cast_columns(edited_data)
             st.write(edited_data)
-            edited_data = delete_null_rows(edited_data)
-            edited_data_nan = modifying_nas(edited_data)
+            edited_data = delete_null_rows(modifying_nas(edited_data))
+            
             table_id = selected_row['table_id']
             table_id_split = table_id.split('.')
             selected_bucket = table_id_split[0] + '.' + table_id_split[1]
@@ -493,7 +493,7 @@ elif st.session_state['selected-table']is not None:
             date_setting = date_setting(column_setting)
             st.write(f"Required date setting: {date_setting}")
             if date_setting:
-                checking_date = check_date_format(edited_data_nan, date_setting)
+                checking_date = check_date_format(edited_data, date_setting)
                 st.write(f"Checking date: {checking_date[0]}, {checking_date[1]}")
                 
             if date_setting and checking_date[0]:
