@@ -612,7 +612,7 @@ elif st.session_state['upload-tables']:
                                 if date_setting:
                                     df = checking_date[1]
                                 else:
-                                    pass
+                                    df = modifying_nas(df)
                                 df.to_csv(temp_file_path, index=False)
                                 try:
                                     with st.spinner('Uploading...'):
