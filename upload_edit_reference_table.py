@@ -331,6 +331,7 @@ def delete_null_rows(df_for_editing):
     for col in col_names:
         if df_for_editing[col].dropna().isin([True, False]).all():
             bool_columns.append(col)
+    st.write(f"Bool columns: {bool_columns}")
     df_without_bool = df_for_editing.drop(columns=bool_columns)
     col_names_without_bool = df_without_bool.columns.values.tolist()
     all_col_null_check = df_without_bool[col_names_without_bool].isnull().apply(lambda x: all(x), axis=1)
