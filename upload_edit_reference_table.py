@@ -587,7 +587,7 @@ elif st.session_state['upload-tables']:
                             if missing_columns:
                                 st.error(f"Some columns are missing in the file. Affected columns: {', '.join(missing_columns)}. The column names are case-sensitive. Please edit it before proceeding.")
                             elif extra_columns:
-                                st.error(f"There are extra columns. Adding new columns is not allowed. Affected columns: {', '.join(extra_columns)}. The column names are case-sensitive. If you want to add new columns, please contact the data team.")
+                                st.error(f"There are extra columns. Adding new columns is not allowed. Affected columns: {', '.join(extra_columns)}. The column names are case-sensitive. If you want to add new columns, please contact the analytics team.")
                             elif check_null_rows(modifying_nas(df)):
                                 st.error("The file contains null rows. Please remove them before proceeding.")
                             elif check_col_types(df, format_setting):
@@ -624,7 +624,7 @@ elif st.session_state['upload-tables']:
                     else:
                         st.write("Waiting for a confirmation...")
                 else:
-                    st.error("It is not allowed to create new tables. You need to overwrite the existing one. If you want to create a new table, contact the data team.")
+                    st.error("It is not allowed to create new tables. You need to overwrite the existing one. If you want to create a new table, contact the analytics team.")
             else:
                 st.error('Error: Please upload a file and select a table name.') 
 
