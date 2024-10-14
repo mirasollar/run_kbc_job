@@ -247,6 +247,7 @@ def get_setting(tkn, kbc_bucket_id, kbc_table_id):
     c = Client('https://connection.eu-central-1.keboola.com', tkn)
     description = c.tables.detail(kbc_table_id)["metadata"][0]["value"]
     table_columns = c.tables.detail(kbc_table_id)["columns"]
+    col_metadata = c.tables.detail(kbc_table_id)["columnMetadata"]
     primary_key = c.tables.detail(kbc_table_id)["primaryKey"]
     if 'Upload setting' in description:
         description = description.replace('\n','')
@@ -257,7 +258,13 @@ def get_setting(tkn, kbc_bucket_id, kbc_table_id):
         col_setting = json.loads(col_setting)
     else:
         col_setting = {}
-    return col_setting, primary_key, table_columns
+    case_sensitive = {}
+    for col in table_columns:
+        case_sensitive_setting[col] = ''
+        for k, v in col_metadata.items():
+            if col == k and v[0]["value"] == 'case sensitive':
+                case_sensitive[col] = v[0]["value"]
+    return col_setting, primary_key, table_columns, case_sensitive
         
 def check_columns_diff(current_columns, file_columns):
     missing_columns = [x for x in current_columns if x not in set(file_columns)]
@@ -350,12 +357,13 @@ def check_null_cells(df_to_check, col_setting):
             wrong_cols.append(i)
     return wrong_cols
 
-def check_duplicates(df_to_check, duplicity_setting = []):
-    # df_to_check = df_to_check.replace(r'^(\s*|None|none|NaN|nan|null|n\/a|N\/A)$', np.nan, regex=True)
+def check_duplicates(df_to_check, cs_setting, pk_setting = []):
     df_to_check = df_to_check.astype(str)
-    if duplicity_setting:
-        df_to_check = df_to_check[duplicity_setting]
-    df_to_check = df_to_check.applymap(lambda s: s.lower() if type(s) == str else s)
+    for k, v in cs_setting.items():
+        if v == '':
+            df_to_check[k] = df_to_check[k].apply(str.lower)
+    if pk_setting:
+        df_to_check = df_to_check[pk_setting]
     duplicity_value = len(df_to_check.duplicated().unique().tolist())
     return duplicity_value
         
@@ -486,8 +494,10 @@ elif st.session_state['selected-table']is not None:
             # st.write(f"Required column formatting: {format_setting}")
             null_cells_setting = split_dict(column_setting, 1)
             # st.write(f"Required not null cells setting: {null_cells_setting}")
-            dupl_setting = get_setting(token, selected_bucket, table_id)[1]
-            # st.write(f"Required duplicity setting: {dupl_setting}")
+            case_sensitive_setting = get_setting(token, selected_bucket, table_id)[3]
+            # st.write(f"Required case sensitive setting: {case_sensitive_setting}")
+            primary_key_setting = get_setting(token, selected_bucket, table_id)[1]
+            # st.write(f"Required primary key setting: {primary_key_setting}")
             date_setting = date_setting(column_setting)
             # st.write(f"Required date setting: {date_setting}")
             if date_setting:
@@ -496,9 +506,9 @@ elif st.session_state['selected-table']is not None:
                 st.error(f"The file contains date in the wrong format. Affected columns: {', '.join(checking_date[0])}. Please edit it before proceeding.")
             elif check_null_cells(edited_data, null_cells_setting):
                 st.error(f"The table contains data with null values. Affected columns: {', '.join(check_null_cells(edited_data, null_cells_setting))}. Please edit it before proceeding.")
-            elif dupl_setting and check_duplicates(edited_data, dupl_setting) == 2:
-                st.error(f"The table contains columns with duplicate values. Affected columns: {', '.join(dupl_setting)}. Please edit it before proceeding.")
-            elif check_duplicates(edited_data) == 2:
+            elif primary_key_setting and check_duplicates(edited_data, case_sensitive_setting, primary_key_setting) == 2:
+                st.error(f"The table contains columns with duplicate values. Affected columns: {', '.join(primary_key_setting)}. Please edit it before proceeding.")
+            elif check_duplicates(edited_data, case_sensitive_setting) == 2:
                 st.error("The table contains duplicate rows. Please remove them before proceeding.")
             else:                            
                 if date_setting:
@@ -562,8 +572,10 @@ elif st.session_state['upload-tables']:
                         # st.write(f"Required column formatting: {format_setting}")
                         null_cells_setting = split_dict(column_setting, 1)
                         # st.write(f"Required not null cells setting: {null_cells_setting}")
-                        dupl_setting = get_setting(token, selected_bucket, table_id)[1]
-                        # st.write(f"Required duplicity setting: {dupl_setting}")
+                        case_sensitive_setting = get_setting(token, selected_bucket, table_id)[3]
+                        # st.write(f"Required case sensitive setting: {case_sensitive_setting}")
+                        primary_key_setting = get_setting(token, selected_bucket, table_id)[1]
+                        # st.write(f"Required primary key setting: {primary_key_setting}")
                         date_setting = date_setting(column_setting)
                         # st.write(f"Required date setting: {date_setting}")
 
@@ -596,9 +608,9 @@ elif st.session_state['upload-tables']:
                                 st.error(f"The file contains date in the wrong format. Affected columns: {', '.join(checking_date[0])}. Please edit it before proceeding.")         
                             elif check_null_cells(modifying_nas(df), null_cells_setting):
                                 st.error(f"The file contains data with null values. Affected columns: {', '.join(check_null_cells(modifying_nas(df), null_cells_setting))}. Please edit it before proceeding.")
-                            elif dupl_setting and check_duplicates(df, dupl_setting) == 2:
-                                st.error(f"The table contains columns with duplicate values. Affected columns: {', '.join(dupl_setting)}. Please edit it before proceeding.")
-                            elif check_duplicates(df) == 2:
+                            elif primary_key_setting and check_duplicates(df, case_sensitive_setting, primary_key_setting) == 2:
+                                st.error(f"The table contains columns with duplicate values. Affected columns: {', '.join(primary_key_setting)}. Please edit it before proceeding.")
+                            elif check_duplicates(df, case_sensitive_setting) == 2:
                                 st.error("The table contains duplicate rows. Please remove them before proceeding.")
                             else:
                                 if date_setting:
