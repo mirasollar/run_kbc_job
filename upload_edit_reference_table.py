@@ -260,7 +260,7 @@ def get_setting(tkn, kbc_bucket_id, kbc_table_id):
         col_setting = {}
     case_sensitive = {}
     for col in table_columns:
-        case_sensitive_setting[col] = ''
+        case_sensitive[col] = ''
         for k, v in col_metadata.items():
             if col == k and v[0]["value"] == 'case sensitive':
                 case_sensitive[col] = v[0]["value"]
