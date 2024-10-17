@@ -314,6 +314,11 @@ def modifying_nas(df_for_editing):
     mod_df = df_for_editing.replace(r'^(\s*|None|none|NONE|NaN|nan|Null|null|NULL|n\/a|N\/A|<NA>)$', np.nan, regex=True)
     return mod_df
 
+def delete_decimal_zero(df_for_editing):
+    df_for_editing = df_for_editing.astype(str)
+    output_df = df_for_editing.replace(r'\.0$', '', regex=True)
+    return output_df
+
 def check_date_format(df_to_check, date_setting_dict):
     col_names = df_to_check.columns.values.tolist()
     col_names_to_check = list(set(col_names).intersection(list(date_setting_dict.keys())))
@@ -517,7 +522,7 @@ elif st.session_state['selected-table']is not None:
                 else:
                     st.session_state["data"] = edited_data
                 # is_incremental = bool(selected_row.get('primaryKey', False))   
-                write_to_keboola(edited_data, st.session_state["selected-table"],f'updated_data.csv.gz', False)
+                write_to_keboola(delete_decimal_zero(edited_data), st.session_state["selected-table"],f'updated_data.csv.gz', False)
                 st.success('Data Updated!', icon = "🎉")
                 st.cache_data.clear()
 
