@@ -315,9 +315,12 @@ def modifying_nas(df_for_editing):
     return mod_df
 
 def delete_decimal_zero(df_for_editing):
-    df_for_editing = df_for_editing.astype(str)
-    output_df = df_for_editing.replace(r'\.0$', '', regex=True)
-    return output_df
+    for k, v in df_for_editing.dtypes.astype(str).to_dict().items():
+        if re.search("(int|float).*", v):
+            print(k, v)
+            df_for_editing[k] = df_for_editing[k].astype(str)
+            df_for_editing[k] = df_for_editing[k].replace(r'\.0$', '', regex=True)
+    return df_for_editing
 
 def check_date_format(df_to_check, date_setting_dict):
     col_names = df_to_check.columns.values.tolist()
@@ -488,6 +491,7 @@ elif st.session_state['selected-table']is not None:
             edited_data = cast_columns(edited_data)
             # st.write(edited_data)
             edited_data = delete_null_rows(modifying_nas(edited_data))
+            edited_data = delete_decimal_zero(edited_data)
             
             table_id = selected_row['table_id']
             table_id_split = table_id.split('.')
@@ -522,7 +526,7 @@ elif st.session_state['selected-table']is not None:
                 else:
                     st.session_state["data"] = edited_data
                 # is_incremental = bool(selected_row.get('primaryKey', False))   
-                write_to_keboola(delete_decimal_zero(edited_data), st.session_state["selected-table"],f'updated_data.csv.gz', False)
+                write_to_keboola(edited_data, st.session_state["selected-table"],f'updated_data.csv.gz', False)
                 st.success('Data Updated!', icon = "🎉")
                 st.cache_data.clear()
 
