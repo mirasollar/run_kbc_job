@@ -317,7 +317,7 @@ def modifying_nas(df_for_editing):
 def delete_decimal_zero(df_for_editing):
     for k, v in df_for_editing.dtypes.astype(str).to_dict().items():
         if re.search("(int|float).*", v):
-            print(k, v)
+            st.write(f"Column name: {k}, Format: {v}")
             df_for_editing[k] = df_for_editing[k].astype(str)
             df_for_editing[k] = df_for_editing[k].replace(r'\.0$', '', regex=True)
     return df_for_editing
