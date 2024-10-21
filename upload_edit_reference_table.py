@@ -185,9 +185,9 @@ def display_table_section(row):
 def display_footer_section():
     left_aligned, space_col, right_aligned = st.columns((2,7,1))
     with left_aligned:
-        st.caption("© Keboola 2024")
-    with right_aligned:
-        st.caption("Version 2.0")
+        st.caption(f"© Keboola & Miroslav Šollar {now.year}")
+    # with right_aligned:
+    #    st.caption("Version 2.0")
 
 def write_to_keboola(data, table_name, table_path, incremental):
     """
