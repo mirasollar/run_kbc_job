@@ -550,7 +550,7 @@ elif st.session_state['selected-table']is not None:
             
             selected_bucket = split_table_id(selected_row['table_id'])[0]
             # show column formatting settings
-            column_setting = get_setting(token, selected_bucket, table_id)[0]
+            column_setting = get_setting(token, selected_bucket, selected_row['table_id'])[0]
             # st.write(f"Required column setting: {column_setting}")
             format_setting = split_dict(column_setting, 2)
             # st.write(f"Required column formatting: {format_setting}")
