@@ -11,6 +11,7 @@ from pathlib import Path
 import re
 import json
 import numpy as np
+import io
 
 # Setting page config
 st.set_page_config(page_title="Keboola Data Editor", page_icon=":robot:", layout="wide")
@@ -281,6 +282,12 @@ def split_dict(setting_dict, n):
         modified_dict = {k:v for k,v in d.items() if v != 'ignore'}
     return modified_dict
 
+def split_table_id(selected_table_id):
+    table_id_split = selected_table_id.split('.')
+    bucket_name = table_id_split[0] + '.' + table_id_split[1]
+    table_name = table_id_split[2]
+    return bucket_name, table_name
+
 def date_setting(column_setting_dict):
     date_setting = {k: v for k, v in column_setting_dict.items() if re.search("%", v)}
     return date_setting
@@ -483,6 +490,54 @@ elif st.session_state['selected-table']is not None:
             st.markdown(f"**Updated:** {selected_row.get('lastImportDate', 'N/A')}")
             st.markdown(f"**Primary Key:** {selected_row.get('primaryKey', 'N/A')}")
             st.markdown(f"**Rows Count:** {selected_row['rowsCount']}")
+
+    # Download table as CSV, TSV or Excel
+    downloaded_data = cast_columns(st.session_state['data'])
+    downloaded_data = delete_null_rows(modifying_nas(downloaded_data))
+    downloaded_data = delete_decimal_zero(downloaded_data)
+    downloaded_file_name = split_table_id(selected_row['table_id'])[1]
+        
+    # Uložení dataframe do CSV v paměti
+    csv_buffer = io.StringIO()
+    downloaded_data.to_csv(csv_buffer, index=False)
+    csv_data = csv_buffer.getvalue()
+
+    # Uložení dataframe do TSV v paměti
+    tsv_buffer = io.StringIO()
+    downloaded_data.to_csv(tsv_buffer, sep='\t', index=False)
+    tsv_data = tsv_buffer.getvalue()
+
+    # Uložení dataframe do Excelu v paměti
+    xlsx_buffer = io.BytesIO()
+    with pd.ExcelWriter(xlsx_buffer, engine='openpyxl') as writer:
+        downloaded_data.to_excel(writer, index=False)
+    xlsx_data = xlsx_buffer.getvalue()
+
+    col5, col6, col7 = st.columns([1, 1, 3])
+
+    with col5:
+        st.download_button(
+            label="Download CSV",
+            data=csv_data,
+            file_name=f"{downloaded_file_name}.csv",
+            mime='text/csv'
+        )
+
+    with col6:
+        st.download_button(
+            label="Download TSV",
+            data=tsv_data,
+            file_name=f"{downloaded_file_name}.txt",
+            mime='text/tab-separated-values'
+        )
+
+    with col7:
+        st.download_button(
+            label="Download XLSX",
+            data=xlsx_data,
+            file_name=f"{downloaded_file_name}.xlsx",
+            mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
         
     edited_data = st.data_editor(st.session_state["data"], num_rows="dynamic", height=500, use_container_width=True)
 
