@@ -156,7 +156,7 @@ def ChangeButtonColour(widget_label, font_color, background_color, border_color)
 
 def fetch_all_ids():
     all_tables = client.tables.list()
-    ids_list = [{'table_id': table["id"], 'displayName': table["displayName"], 'primaryKey': table["primaryKey"][0] if table["primaryKey"] else "",
+    ids_list = [{'table_id': table["id"], 'displayName': table["displayName"], 'primaryKey': table["primaryKey"] if table["primaryKey"] else "",
                   'lastImportDate': table['lastImportDate'], 'rowsCount': table['rowsCount'], 'created': table['created']} for table in all_tables]
     return pd.DataFrame(ids_list)
 
