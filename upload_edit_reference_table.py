@@ -548,9 +548,7 @@ elif st.session_state['selected-table']is not None:
             edited_data = delete_null_rows(modifying_nas(edited_data))
             edited_data = delete_decimal_zero(edited_data)
             
-            table_id = selected_row['table_id']
-            table_id_split = table_id.split('.')
-            selected_bucket = table_id_split[0] + '.' + table_id_split[1]
+            selected_bucket = split_table_id(selected_row['table_id'])[0]
             # show column formatting settings
             column_setting = get_setting(token, selected_bucket, table_id)[0]
             # st.write(f"Required column setting: {column_setting}")
@@ -558,9 +556,9 @@ elif st.session_state['selected-table']is not None:
             # st.write(f"Required column formatting: {format_setting}")
             null_cells_setting = split_dict(column_setting, 1)
             # st.write(f"Required not null cells setting: {null_cells_setting}")
-            case_sensitive_setting = get_setting(token, selected_bucket, table_id)[3]
+            case_sensitive_setting = get_setting(token, selected_bucket, selected_row['table_id'])[3]
             # st.write(f"Required case sensitive setting: {case_sensitive_setting}")
-            primary_key_setting = get_setting(token, selected_bucket, table_id)[1]
+            primary_key_setting = get_setting(token, selected_bucket, selected_row['table_id'])[1]
             # st.write(f"Required primary key setting: {primary_key_setting}")
             date_setting = date_setting(column_setting)
             # st.write(f"Required date setting: {date_setting}")
