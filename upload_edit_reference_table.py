@@ -513,7 +513,7 @@ elif st.session_state['selected-table']is not None:
         downloaded_data.to_excel(writer, index=False)
     xlsx_data = xlsx_buffer.getvalue()
 
-    col5, col6, col7 = st.columns([1, 1, 3])
+    col5, col6, col7 = st.columns([1, 1, 6])
 
     with col5:
         st.download_button(
