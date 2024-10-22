@@ -368,7 +368,7 @@ def check_null_cells(df_to_check, col_setting):
     col_names = df_to_check.columns.values.tolist()
     col_names_to_check = list(set(col_names).intersection(list(col_setting.keys())))
     for i in col_names_to_check:
-        if [x for x in df_to_check[i].tolist() if re.search("nan|None|<NA>", x)]:
+        if [x for x in df_to_check[i].tolist() if re.search("^(nan|None|<NA>)$", x)]:
             wrong_cols.append(i)
     return wrong_cols
 
