@@ -185,7 +185,7 @@ def display_table_section(row):
 def display_footer_section():
     left_aligned, space_col, right_aligned = st.columns((2,7,1))
     with left_aligned:
-        st.caption(f"© Keboola & Miroslav Šollar {datetime.datetime.now().year}")
+        st.caption(f"© Keboola & Seznam.cz {datetime.datetime.now().year}")
     # with right_aligned:
     #    st.caption("Version 2.0")
 
