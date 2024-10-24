@@ -549,6 +549,7 @@ elif st.session_state['selected-table']is not None:
         
     edited_data = st.data_editor(st.session_state["data"], num_rows="dynamic", height=500, use_container_width=True,
                                  column_config=create_column_config(st.session_state["data"]))
+    st.write(st.session_state["data"].dtypes)
 
     if st.button("Save Data", key="save-data-tables"):
         with st.spinner('Saving Data...'):
