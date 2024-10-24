@@ -297,6 +297,14 @@ def check_null_rows(df_to_check):
     all_col_null_check = df_to_check[col_names].isnull().apply(lambda x: all(x), axis=1)
     return any(all_col_null_check.tolist())
 
+def create_column_config(df_to_edit):
+    column_config = {}
+    col_types_dict = df_to_edit.dtypes.astype(str).to_dict()
+    for k, v in col_types_dict.items():
+        if v == 'int64':
+            column_config[k] = st.column_config.NumberColumn(format="%d")
+    return column_config
+
 def check_col_types(df_to_check, col_setting):
     col_types_dict = df_to_check.dtypes.astype(str).to_dict()
     for x, y in col_types_dict.items():
@@ -539,7 +547,8 @@ elif st.session_state['selected-table']is not None:
             mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         )
         
-    edited_data = st.data_editor(st.session_state["data"], num_rows="dynamic", height=500, use_container_width=True)
+    edited_data = st.data_editor(st.session_state["data"], num_rows="dynamic", height=500, use_container_width=True,
+                                 column_config=create_column_config(st.session_state["data"]))
 
     if st.button("Save Data", key="save-data-tables"):
         with st.spinner('Saving Data...'):
