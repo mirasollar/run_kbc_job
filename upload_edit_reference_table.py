@@ -154,13 +154,13 @@ def ChangeButtonColour(widget_label, font_color, background_color, border_color)
 # Fetch and prepare table IDs and short description
 @st.cache_data(ttl=60)
 
-'''
-def fetch_all_ids():
-    all_tables = client.tables.list()
-    ids_list = [{'table_id': table["id"], 'displayName': table["displayName"], 'primaryKey': ', '.join(table["primaryKey"]) if table["primaryKey"] else "",
-                  'lastImportDate': table['lastImportDate'], 'rowsCount': table['rowsCount'], 'created': table['created']} for table in all_tables]
-    return pd.DataFrame(ids_list)
-'''
+
+# def fetch_all_ids():
+#    all_tables = client.tables.list()
+#    ids_list = [{'table_id': table["id"], 'displayName': table["displayName"], 'primaryKey': ', '.join(table["primaryKey"]) if table["primaryKey"] else "",
+#                  'lastImportDate': table['lastImportDate'], 'rowsCount': table['rowsCount'], 'created': table['created']} for table in all_tables]
+#    return pd.DataFrame(ids_list)
+
 # na detail(id) jsou i metadata (description)
 def fetch_all_ids():
     table_ids = [table["id"] for table in client.tables.list()]
