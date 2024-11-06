@@ -492,6 +492,7 @@ elif st.session_state['selected-table']is not None:
         if len(selected_row) == 1:
             # Convert the row to a Series to facilitate access
             selected_row = selected_row.iloc[0]
+            st.write(selected_row)
             # Displaying data in bold using Markdown
             st.markdown(f"**Table ID:** {selected_row['table_id']}")
             st.markdown(f"**Created:** {selected_row['created']}")
