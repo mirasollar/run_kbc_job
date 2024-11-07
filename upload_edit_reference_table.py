@@ -517,7 +517,9 @@ elif st.session_state['selected-table']is not None:
             st.markdown(f"**Created:** {selected_row['created']}")
             st.markdown(f"**Updated:** {selected_row.get('lastImportDate', 'N/A')}")
             st.markdown(f"**Primary Key:** {selected_row.get('primaryKey', 'N/A')}")
-            st.markdown(f"**Updated:** {selected_row.get('description', 'N/A')}")
+            description = selected_row['description']
+            table_setting = re.sub(r'```.*', '', re.sub(r'.*Upload setting:?\s*```\{', '{', description))
+            st.markdown(f"**Table Setting:** {table_setting}")
             st.markdown(f"**Rows Count:** {selected_row['rowsCount']}")
 
     # Download table as CSV, TSV or Excel
