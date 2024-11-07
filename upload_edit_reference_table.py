@@ -161,20 +161,23 @@ def ChangeButtonColour(widget_label, font_color, background_color, border_color)
 #                  'lastImportDate': table['lastImportDate'], 'rowsCount': table['rowsCount'], 'created': table['created']} for table in all_tables]
 #    return pd.DataFrame(ids_list)
 
-# na detail(id) jsou i metadata (description)
 def fetch_all_ids():
-    table_ids = [table["id"] for table in client.tables.list()]
-    all_tables = [client.tables.detail(table_id) for table_id in table_ids]
-    ids_list = [{
-        'table_id': table["id"],
-        'displayName': table["displayName"],
-        'primaryKey': ', '.join(table["primaryKey"]) if table["primaryKey"] else "",
-        'lastImportDate': table['lastImportDate'],
-        'rowsCount': table['rowsCount'],
-        'created': table['created'],
-        'description': table.get("metadata", [{}])[0].get("value")
-    } for table in all_tables]
-    return pd.DataFrame(ids_list)
+    df = pd.DataFrame()
+    bucket_ids = [bucket["id"] for bucket in client.buckets.list()]
+    all_tables_in_buckets = [client.buckets.list_tables(bucket_id) for bucket_id in bucket_ids]
+    for tables in all_tables_in_buckets:
+        ids_list = [{
+            'table_id': table["id"],
+            'displayName': table["displayName"],
+            'primaryKey': ', '.join(table["primaryKey"]) if table["primaryKey"] else "",
+            'lastImportDate': table['lastImportDate'],
+            'rowsCount': table['rowsCount'],
+            'created': table['created'],
+            'description': next((item['value'] for item in table["metadata"] if item['key'] == 'KBC.description'), None) 
+        } for table in tables]
+        df_stage = pd.DataFrame(ids_list)
+        df = pd.concat([df, df_stage])
+    return df
 
 # Definujte callback funkci pro tlačítko
 def on_click_uploads():
