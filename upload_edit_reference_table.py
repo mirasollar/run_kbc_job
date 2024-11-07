@@ -514,7 +514,8 @@ elif st.session_state['selected-table']is not None:
             # st.write(selected_row)
             # Displaying data in bold using Markdown
             st.markdown(f"**Table ID:** {selected_row['table_id']}")
-            st.markdown(f"**Created:** {selected_row['created']}")
+            dt_created = selected_row['created']
+            st.markdown(f"**Created:** {dt_created.split("T")[0]}, {dt_created.split("T")[1]}")
             st.markdown(f"**Updated:** {selected_row.get('lastImportDate', 'N/A')}")
             st.markdown(f"**Primary Key:** {selected_row.get('primaryKey', 'N/A')}")
             description = selected_row['description']
