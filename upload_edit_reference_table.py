@@ -511,13 +511,13 @@ elif st.session_state['selected-table']is not None:
         if len(selected_row) == 1:
             # Convert the row to a Series to facilitate access
             selected_row = selected_row.iloc[0]
-            st.write(selected_row)
+            # st.write(selected_row)
             # Displaying data in bold using Markdown
             st.markdown(f"**Table ID:** {selected_row['table_id']}")
             st.markdown(f"**Created:** {selected_row['created']}")
             st.markdown(f"**Updated:** {selected_row.get('lastImportDate', 'N/A')}")
             st.markdown(f"**Primary Key:** {selected_row.get('primaryKey', 'N/A')}")
-            # st.markdown(f"**Table Setting:** {selected_row['metadata'][0]['value']}")
+            st.markdown(f"**Table Setting:** {selected_row.get(re.sub(r'```.*', '', re.sub(r'.*Upload setting:?\s*```\{', '{', "description")), 'N/A')}")
             st.markdown(f"**Rows Count:** {selected_row['rowsCount']}")
 
     # Download table as CSV, TSV or Excel
