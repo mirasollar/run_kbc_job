@@ -98,8 +98,9 @@ def update_session_state(table_id):
 def display_table_card(row):
     card(
         title=row["displayName"],
-        # title=row["displayName"].upper(),   
-        text=[f"Primary key: {row['primaryKey']}", f"Table ID: {row['table_id']}", f"Updated at: {row['lastImportDate']}", f"Created at: {row['created']}", f"Rows count: {str(row['rowsCount'])}"],
+        # title=row["displayName"].upper(),  
+        # text=[f"Primary key: {row['primaryKey']}", f"Table ID: {row['table_id']}", f"Updated at: {row['lastImportDate']}", f"Created at: {row['created']}", f"Rows count: {str(row['rowsCount'])}"],
+        text=[f"Table ID: {row['table_id']}", f"Updated at: {row['lastImportDate']}", f"Created at: {row['created']}", f"Rows count: {str(row['rowsCount'])}"],
         styles={
             "card": {
                 "width": "100%",
@@ -307,6 +308,9 @@ def split_table_id(selected_table_id):
     table_name = table_id_split[2]
     return bucket_name, table_name
 
+def split_datetime(dt):
+    return f"Date: {dt.split('T')[0]}, Time: {dt.split('T')[1]}"
+        
 def date_setting(column_setting_dict):
     date_setting = {k: v for k, v in column_setting_dict.items() if re.search("%", v)}
     return date_setting
@@ -514,8 +518,9 @@ elif st.session_state['selected-table']is not None:
             # st.write(selected_row)
             # Displaying data in bold using Markdown
             st.markdown(f"**Table ID:** {selected_row['table_id']}")
-            dt_created = selected_row['created']
-            st.markdown(f"**Created:** {dt_created.split('T')[0]}, {dt_created.split('T')[1]}")
+            # dt_created = selected_row['created']
+            # st.markdown(f"**Created:** {dt_created.split('T')[0]}, {dt_created.split('T')[1]}")
+            st.markdown(f"**Created:** {split_datetime(selected_row['created'])}")
             st.markdown(f"**Updated:** {selected_row.get('lastImportDate', 'N/A')}")
             st.markdown(f"**Primary Key:** {selected_row.get('primaryKey', 'N/A')}")
             description = selected_row['description']
