@@ -520,8 +520,8 @@ elif st.session_state['selected-table']is not None:
             st.markdown(f"**Table ID:** {selected_row['table_id']}")
             # dt_created = selected_row['created']
             # st.markdown(f"**Created:** {dt_created.split('T')[0]}, {dt_created.split('T')[1]}")
-            st.markdown(f"**Created:** {split_datetime(selected_row['created'])}")
-            # st.markdown(f"**Updated:** {selected_row.get('lastImportDate', 'N/A')}")
+            st.markdown(f"**Created at:** {split_datetime(selected_row['created'])}")
+            # st.markdown(f"**Updated at:** {selected_row.get('lastImportDate', 'N/A')}")
             st.markdown(f"**Updated:** {split_datetime(selected_row['lastImportDate'])}")
             st.markdown(f"**Primary Key:** {selected_row.get('primaryKey', 'N/A')}")
             description = selected_row['description']
