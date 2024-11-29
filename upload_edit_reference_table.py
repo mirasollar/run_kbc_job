@@ -521,8 +521,8 @@ elif st.session_state['selected-table']is not None:
             # dt_created = selected_row['created']
             # st.markdown(f"**Created:** {dt_created.split('T')[0]}, {dt_created.split('T')[1]}")
             st.markdown(f"**Created at:** {split_datetime(selected_row['created'])}")
-            # st.markdown(f"**Updated at:** {selected_row.get('lastImportDate', 'N/A')}")
-            st.markdown(f"**Updated:** {split_datetime(selected_row['lastImportDate'])}")
+            # st.markdown(f"**Updated:** {selected_row.get('lastImportDate', 'N/A')}")
+            st.markdown(f"**Updated at:** {split_datetime(selected_row['lastImportDate'])}")
             st.markdown(f"**Primary Key:** {selected_row.get('primaryKey', 'N/A')}")
             description = selected_row['description']
             table_setting = re.sub(r'```.*', '', re.sub(r'.*Upload setting:?\s*```\{', '{', description))
