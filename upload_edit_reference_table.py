@@ -100,7 +100,7 @@ def display_table_card(row):
         title=row["displayName"],
         # title=row["displayName"].upper(),  
         # text=[f"Primary key: {row['primaryKey']}", f"Table ID: {row['table_id']}", f"Updated at: {row['lastImportDate']}", f"Created at: {row['created']}", f"Rows count: {str(row['rowsCount'])}"],
-        text=[f"Table ID: {row['table_id']}", f"Updated at: {row['lastImportDate']}", f"Created at: {row['created']}", f"Rows count: {str(row['rowsCount'])}"],
+        text=[f"Table ID: {row['table_id']}", f"Created at: {split_datetime(row['created'])}", f"Updated at: {split_datetime(row['lastImportDate'])}", f"Rows count: {str(row['rowsCount'])}"],
         styles={
             "card": {
                 "width": "100%",
@@ -521,7 +521,8 @@ elif st.session_state['selected-table']is not None:
             # dt_created = selected_row['created']
             # st.markdown(f"**Created:** {dt_created.split('T')[0]}, {dt_created.split('T')[1]}")
             st.markdown(f"**Created:** {split_datetime(selected_row['created'])}")
-            st.markdown(f"**Updated:** {selected_row.get('lastImportDate', 'N/A')}")
+            # st.markdown(f"**Updated:** {selected_row.get('lastImportDate', 'N/A')}")
+            st.markdown(f"**Updated:** {split_datetime(selected_row['lastImportDate'])}")
             st.markdown(f"**Primary Key:** {selected_row.get('primaryKey', 'N/A')}")
             description = selected_row['description']
             table_setting = re.sub(r'```.*', '', re.sub(r'.*Upload setting:?\s*```\{', '{', description))
