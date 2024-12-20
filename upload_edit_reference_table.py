@@ -614,9 +614,10 @@ elif st.session_state['selected-table']is not None:
             else:                            
                 if date_setting:
                     st.session_state["data"] = checking_date[1]
-                    edited_data = checking_date[1]
+                    edited_data = modifying_nas(checking_date[1])
                 else:
                     st.session_state["data"] = edited_data
+                edited_data = modifying_nas(edited_data)
                 # is_incremental = bool(selected_row.get('primaryKey', False))   
                 write_to_keboola(edited_data, st.session_state["selected-table"],f'updated_data.csv.gz', False)
                 st.success('Data Updated!', icon = "🎉")
