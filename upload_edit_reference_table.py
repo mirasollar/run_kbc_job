@@ -174,7 +174,8 @@ def fetch_all_ids():
             'lastImportDate': table['lastImportDate'],
             'rowsCount': table['rowsCount'],
             'created': table['created'],
-            'description': next((item['value'] for item in table["metadata"] if item['key'] == 'KBC.description'), None) 
+            'description': next((item['value'] for item in table["metadata"] if item['key'] == 'KBC.description'), None),
+            'column_metadata': client.tables.detail(table["id"])["columnMetadata"]
         } for table in tables]
         df_stage = pd.DataFrame(ids_list)
         df = pd.concat([df, df_stage])
@@ -526,7 +527,10 @@ elif st.session_state['selected-table']is not None:
             st.markdown(f"**Primary Key:** {selected_row.get('primaryKey', 'N/A')}")
             description = selected_row['description']
             table_setting = re.sub(r'```.*', '', re.sub(r'.*Upload setting:?\s*```\{', '{', description))
+            case_insensitive_columns = selected_row['column_metadata']
             st.markdown(f"**Table Setting:** {table_setting}")
+            if case_insensitive_columns:
+                st.markdown(f"**Case Insensitive Columns:** {case_insensitive_columns}")
             st.markdown(f"**Rows Count:** {selected_row['rowsCount']}")
 
     # Download table as CSV, TSV or Excel
