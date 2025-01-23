@@ -528,7 +528,7 @@ elif st.session_state['selected-table']is not None:
             description = selected_row['description']
             table_setting_str_dict = re.sub(r'```.*', '', re.sub(r'.*Upload setting:?\s*```\{', '{', description))
             # table_setting_dict = json.loads(table_setting_str_dict)
-            st.markdown(f"**Table Setting:** {type(table_setting_str_dict)}")
+            st.markdown(f"**Table Setting:** {table_setting_str_dict}")
             # table_setting_str = ', '.join(f"*{key}*: {value}" for key, value in table_setting.items())
             # st.markdown(f"**Table Setting:** {table_setting_str}")
             case_insensitive_columns = [outer_key for outer_key, items in selected_row['column_metadata'].items() if any(item.get('value') == 'case sensitive' for item in items)]
