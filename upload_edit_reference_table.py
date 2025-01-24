@@ -532,7 +532,7 @@ elif st.session_state['selected-table']is not None:
             st.markdown(f"**Table Setting:** {table_setting_str}")
             case_insensitive_columns = [outer_key for outer_key, items in selected_row['column_metadata'].items() if any(item.get('value') == 'case sensitive' for item in items)]
             if case_insensitive_columns:
-                st.markdown(f"**Case Insensitive Columns:** {', '.join(case_insensitive_columns)}")
+                st.markdown(f"**Case Sensitive Columns:** {', '.join(case_insensitive_columns)}")
             st.markdown(f"**Rows Count:** {selected_row['rowsCount']}")
 
     # Download table as CSV, TSV or Excel
