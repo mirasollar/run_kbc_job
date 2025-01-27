@@ -5,4 +5,4 @@ The primary key setting is taken from the table settings in the primary key sect
 
 Upload setting:` ```{'column_name_1': 'data type, setting empty rows', 'column_name_2': 'data type, setting empty rows'}``` `
 
-Possible settings of data types: string, number, logical, date with percentage mark, for example %Y-%m-%d. The [strftime]([https://duckduckgo.com](https://strftime.org/) module is used to check the date format.
+Possible settings of data types: string, number, logical, date with percentage mark, for example %Y-%m-%d. The [strftime](https://strftime.org/) module is used to check the date format.
