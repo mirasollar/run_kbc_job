@@ -33,12 +33,10 @@ if uploaded_file is not None:
     
                 # Vytvoř DataFrame
                 df = pd.DataFrame(rows, columns=header)
-    
 
-    
         except Exception as e:
             st.error(f"Error while processing the file: {e}")
             
-    # Zobraz DataFrame
+
     st.write("DataFrame preview:")
     st.write(df)
