@@ -698,10 +698,13 @@ elif st.session_state['upload-tables']:
                                 try:
                                     df = pd.read_csv(uploaded_file, sep=None, engine='python', encoding='utf-8-sig')
                                 except:
-                                    content = uploaded_file.read()  # Přečti obsah jako bytes
-                                    decoded_content = content.decode('Windows-1250')  # Změň kódování na UTF-16 (nebo jiné dle potřeby)
-                                    converted_file = io.StringIO(decoded_content)
-                                    df = pd.read_csv(converted_file, sep=";", engine='python', encoding='utf-8-sig', keep_default_na=False)
+                                    raw_data = uploaded_file.read().decode("windows-1250")
+                                    converted_file = io.StringIO(raw_data)
+                                    reader = csv.reader(converted_file, delimiter=";")  # Přizpůsob oddělovač
+                                    data = list(reader)  # Obsah celého CSV jako seznam seznamů
+                                    header = data[0]  # První řádek jako hlavička
+                                    rows = data[1:]  # Zbytek řádků jako data
+                                    df = pd.DataFrame(rows, columns=header)
                                     st.write(df.head())
                             else:
                                 df=pd.read_excel(uploaded_file)
