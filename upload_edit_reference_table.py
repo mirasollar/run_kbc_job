@@ -12,6 +12,7 @@ import re
 import json
 import numpy as np
 import io
+from charset_normalizer import from_path
 
 # Setting page config
 st.set_page_config(page_title="Keboola Data Editor", page_icon=":robot:", layout="wide")
@@ -694,7 +695,13 @@ elif st.session_state['upload-tables']:
                             # Save the uploaded file to a temporary path
                             temp_file_path = f"/tmp/{uploaded_file.name}"
                             if Path(uploaded_file.name).suffix == '.csv':
-                                df=pd.read_csv(uploaded_file, sep=None, engine='python', encoding='utf-8-sig')
+                                try:
+                                    df = pd.read_csv(uploaded_file, sep=None, engine='python', encoding='utf-8-sig')
+                                except:
+                                    result = from_path(uploaded_file).best()
+                                    encoding = result.encoding
+                                    # st.write(f"Detected encoding: {encoding}")
+                                    df = pd.read_csv(upload_file, sep=None, engine='python', encoding=encoding)
                             else:
                                 df=pd.read_excel(uploaded_file)
                             if date_setting:
