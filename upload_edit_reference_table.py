@@ -698,11 +698,10 @@ elif st.session_state['upload-tables']:
                                 try:
                                     df = pd.read_csv(uploaded_file, sep=None, engine='python', encoding='utf-8-sig')
                                 except:
-                                    with open(uploaded_file, 'rb') as f:
-                                        content = f.read()
-                                    with open('converted_file.csv', 'wb') as f:
-                                        f.write(content.decode('Windows-1250').encode('utf-8'))
-                                    df = pd.read_csv('converted_file.csv', sep=None, engine='python', encoding='utf-8-sig')
+                                    content = uploaded_file.read()  # Přečti obsah jako bytes
+                                    decoded_content = content.decode('Windows-1250')  # Změň kódování na UTF-16 (nebo jiné dle potřeby)
+                                    converted_file = io.StringIO(decoded_content)
+                                    df = pd.read_csv(converted_file, sep=None, engine='python', encoding='utf-8-sig')
                             else:
                                 df=pd.read_excel(uploaded_file)
                             if date_setting:
