@@ -712,6 +712,7 @@ elif st.session_state['upload-tables']:
                                             header = data[0]
                                             rows = data[1:]
                                             df = pd.DataFrame(rows, columns=header)
+                                            df = df.convert_dtypes()
                                             st.write(f"Dtypes: {df.dtypes}")
                                     except Exception as e:
                                         st.error(f"Error while processing the file: {e}")  
