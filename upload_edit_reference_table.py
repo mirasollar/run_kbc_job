@@ -715,7 +715,6 @@ elif st.session_state['upload-tables']:
                                                     df[col] = pd.to_numeric(df[col], errors='ignore')
                                                 except:
                                                     pass
-                                            st.write(f"Dtypes: {df.dtypes}")
                                     except Exception as e:
                                         st.error(f"Error while processing the file: {e}")  
                             else:
