@@ -701,7 +701,7 @@ elif st.session_state['upload-tables']:
                                     result = from_path(uploaded_file).best()
                                     encoding = result.encoding
                                     # st.write(f"Detected encoding: {encoding}")
-                                    df = pd.read_csv(upload_file, sep=None, engine='python', encoding=encoding)
+                                    df = pd.read_csv(uploaded_file, sep=None, engine='python', encoding=encoding)
                             else:
                                 df=pd.read_excel(uploaded_file)
                             if date_setting:
