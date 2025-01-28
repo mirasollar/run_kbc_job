@@ -699,7 +699,7 @@ elif st.session_state['upload-tables']:
                                 try:
                                     df = pd.read_csv(io.BytesIO(file_content), sep=None, engine='python', encoding='utf-8-sig')
                                 except:
-                                    raw_data = file_content.decode("windows-1250", errors="replace")
+                                    raw_data = file_content.decode("windows-1250", errors="replace").replace("\r\n", "\n")
                                     st.write("File content preview (first 500 chars):")
                                     st.text(raw_data[:500])
                                     converted_file = io.StringIO(raw_data)
