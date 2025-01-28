@@ -698,8 +698,22 @@ elif st.session_state['upload-tables']:
                                 try:
                                     df = pd.read_csv(uploaded_file, sep=None, engine='python', encoding='utf-8-sig')
                                 except:
-                                    df = pd.read_csv(uploaded_file, sep=None, engine='python', encoding='Windows-1250')
-                                    st.write(df.head())
+                                    raw_data = uploaded_file.read().decode("windows-1250", errors="replace")  # Nahraď špatné znaky
+                                    st.write("File content preview (first 500 chars):")
+                                    st.text(raw_data[:500])  # Ukázka prvních 500 znaků pro zjištění, co je na začátku
+                                    converted_file = io.StringIO(raw_data)
+                                    try:
+                                        # Načti obsah jako seznam řádků pomocí knihovny csv
+                                        reader = csv.reader(converted_file, delimiter=";")  # Přizpůsob oddělovač
+                                        data = list(reader)  # Obsah celého CSV jako seznam seznamů
+                                        if len(data) < 2:
+                                            st.error("The file does not contain enough rows to extract data and header.")
+                                        else:
+                                            # První řádek je hlavička
+                                            header = data[0]
+                                            rows = data[1:]  # Všechny ostatní řádky
+                                            df = pd.DataFrame(rows, columns=header)
+                                st.write(df.head())
                             else:
                                 df=pd.read_excel(uploaded_file)
                             if date_setting:
