@@ -11,12 +11,11 @@ if uploaded_file is not None:
         df = pd.read_csv(io.BytesIO(file_content), sep=None, engine='python', encoding='utf-8-sig')
     except:
         raw_data = file_content.decode("windows-1250", errors="replace")  # Nahraď špatné znaky
-        # Zobraz prvních pár znaků souboru pro debugging
         st.write("File content preview (first 500 chars):")
-        st.text(raw_data[:500])  # Ukázka prvních 500 znaků pro zjištění, co je na začátku
+        st.text(raw_data[:500])  
         converted_file = io.StringIO(raw_data)
         try:v
-            reader = csv.reader(converted_file, delimiter=";")  # Přizpůsob oddělovač
+            reader = csv.reader(converted_file, delimiter=";")
             data = list(reader)
             if len(data) < 2:
                 st.error("The file does not contain enough rows to extract data and header.")
