@@ -698,10 +698,11 @@ elif st.session_state['upload-tables']:
                                 try:
                                     df = pd.read_csv(uploaded_file, sep=None, engine='python', encoding='utf-8-sig')
                                 except:
-                                    # result = from_path(uploaded_file).best()
-                                    # encoding = result.encoding
-                                    # st.write(f"Detected encoding: {encoding}")
-                                    df = pd.read_csv(uploaded_file, sep=';', encoding='Windows-1250')
+                                    with open(uploaded_file, 'rb') as f:
+                                        content = f.read()
+                                    with open('converted_file.csv', 'wb') as f:
+                                        f.write(content.decode('Windows-1250').encode('utf-8'))
+                                    df = pd.read_csv('converted_file.csv', sep=None, engine='python', encoding='utf-8-sig')
                             else:
                                 df=pd.read_excel(uploaded_file)
                             if date_setting:
