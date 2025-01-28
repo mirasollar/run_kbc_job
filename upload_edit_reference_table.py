@@ -695,27 +695,25 @@ elif st.session_state['upload-tables']:
                             # Save the uploaded file to a temporary path
                             temp_file_path = f"/tmp/{uploaded_file.name}"
                             if Path(uploaded_file.name).suffix == '.csv':
+                                file_content = uploaded_file.read()
                                 try:
-                                    df = pd.read_csv(uploaded_file, sep=None, engine='python', encoding='utf-8-sig')
+                                    df = pd.read_csv(io.BytesIO(file_content), sep=None, engine='python', encoding='utf-8-sig')
                                 except:
-                                    raw_data = uploaded_file.read().decode("windows-1250", errors="replace")  # Nahraď špatné znaky
-                                    raw_data = raw_data.replace("\r\n", "\n")
+                                    raw_data = file_content.decode("windows-1250", errors="replace")  # Nahraď špatné znaky
                                     st.write("File content preview (first 500 chars):")
-                                    st.text(raw_data[:500])  # Ukázka prvních 500 znaků pro zjištění, co je na začátku
+                                    st.text(raw_data[:500])
                                     converted_file = io.StringIO(raw_data)
                                     try:
-                                        # Načti obsah jako seznam řádků pomocí knihovny csv
-                                        reader = csv.reader(converted_file, delimiter=";")  # Přizpůsob oddělovač
-                                        data = list(reader)  # Obsah celého CSV jako seznam seznamů
+                                        reader = csv.reader(converted_file, delimiter=";")
+                                        data = list(reader)
                                         if len(data) < 2:
                                             st.error("The file does not contain enough rows to extract data and header.")
                                         else:
-                                            # První řádek je hlavička
                                             header = data[0]
-                                            rows = data[1:]  # Všechny ostatní řádky
+                                            rows = data[1:]
                                             df = pd.DataFrame(rows, columns=header)
                                     except Exception as e:
-                                        st.error(f"Error while processing the file: {e}")
+                                        st.error(f"Error while processing the file: {e}")  
                             else:
                                 df=pd.read_excel(uploaded_file)
                             if date_setting:
