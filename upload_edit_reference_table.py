@@ -699,6 +699,7 @@ elif st.session_state['upload-tables']:
                                     df = pd.read_csv(uploaded_file, sep=None, engine='python', encoding='utf-8-sig')
                                 except:
                                     raw_data = uploaded_file.read().decode("windows-1250", errors="replace")  # Nahraď špatné znaky
+                                    raw_data = raw_data.replace("\r\n", "\n")
                                     st.write("File content preview (first 500 chars):")
                                     st.text(raw_data[:500])  # Ukázka prvních 500 znaků pro zjištění, co je na začátku
                                     converted_file = io.StringIO(raw_data)
