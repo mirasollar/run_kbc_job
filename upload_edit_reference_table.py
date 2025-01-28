@@ -702,8 +702,11 @@ elif st.session_state['upload-tables']:
                                     converted_file = io.StringIO(raw_data)
                                     reader = csv.reader(converted_file, delimiter=";")  # Přizpůsob oddělovač
                                     data = list(reader)  # Obsah celého CSV jako seznam seznamů
+                                    
                                     header = data[0]  # První řádek jako hlavička
-                                    rows = data[1:]  # Zbytek řádků jako data
+                                    st.write(f"Header: {header}")
+                                    rows = data[1:10]  # Zbytek řádků jako data
+                                    st.write(f"Row: {rows}")
                                     df = pd.DataFrame(rows, columns=header)
                                     st.write(df.head())
                             else:
