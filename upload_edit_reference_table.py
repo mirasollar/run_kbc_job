@@ -713,6 +713,8 @@ elif st.session_state['upload-tables']:
                                             header = data[0]
                                             rows = data[1:]  # Všechny ostatní řádky
                                             df = pd.DataFrame(rows, columns=header)
+                                    except Exception as e:
+                                        st.error(f"Error while processing the file: {e}")
                             else:
                                 df=pd.read_excel(uploaded_file)
                             if date_setting:
