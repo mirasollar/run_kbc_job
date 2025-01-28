@@ -3,3 +3,4 @@ kbcstorage
 streamlit_card
 extra-streamlit-components
 openpyxl
+charset_normalizer
