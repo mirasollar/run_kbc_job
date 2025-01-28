@@ -699,7 +699,7 @@ elif st.session_state['upload-tables']:
                                 try:
                                     df = pd.read_csv(io.BytesIO(file_content), sep=None, engine='python', encoding='utf-8-sig')
                                 except:
-                                    raw_data = file_content.decode("windows-1250", errors="replace")  # Nahraď špatné znaky
+                                    raw_data = file_content.decode("windows-1250", errors="replace")
                                     st.write("File content preview (first 500 chars):")
                                     st.text(raw_data[:500])
                                     converted_file = io.StringIO(raw_data)
@@ -711,8 +711,9 @@ elif st.session_state['upload-tables']:
                                         else:
                                             header = data[0]
                                             rows = data[1:]
-                                            df = pd.DataFrame(rows, columns=header)
-                                            df = df.convert_dtypes()
+                                            df_windows_encoding = pd.DataFrame(rows, columns=header)
+                                            df = df_windows_encoding.copy()
+                                            df = df.infer_objects()
                                             st.write(f"Dtypes: {df.dtypes}")
                                     except Exception as e:
                                         st.error(f"Error while processing the file: {e}")  
