@@ -701,7 +701,7 @@ elif st.session_state['upload-tables']:
                                     content = uploaded_file.read()  # Přečti obsah jako bytes
                                     decoded_content = content.decode('Windows-1250')  # Změň kódování na UTF-16 (nebo jiné dle potřeby)
                                     converted_file = io.StringIO(decoded_content)
-                                    df = pd.read_csv(converted_file, sep=";", engine='python', encoding='utf-8-sig')
+                                    df = pd.read_csv(converted_file, sep=";", engine='python', encoding='utf-8-sig', keep_default_na=False)
                                     st.write(df.head())
                             else:
                                 df=pd.read_excel(uploaded_file)
