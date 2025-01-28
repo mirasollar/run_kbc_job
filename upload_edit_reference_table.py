@@ -700,8 +700,6 @@ elif st.session_state['upload-tables']:
                                     df = pd.read_csv(io.BytesIO(file_content), sep=None, engine='python', encoding='utf-8-sig')
                                 except:
                                     raw_data = file_content.decode("windows-1250", errors="replace").replace("\r\n", "\n")
-                                    st.write("File content preview (first 500 chars):")
-                                    st.text(raw_data[:500])
                                     converted_file = io.StringIO(raw_data)
                                     try:
                                         reader = csv.reader(converted_file, delimiter=";")
@@ -714,7 +712,7 @@ elif st.session_state['upload-tables']:
                                             df = pd.DataFrame(rows, columns=header)
                                             for col in df.columns:
                                                 try:
-                                                    df[col] = pd.to_numeric(df[col], errors='ignore')  # Převod na čísla
+                                                    df[col] = pd.to_numeric(df[col], errors='ignore')
                                                 except:
                                                     pass
                                             st.write(f"Dtypes: {df.dtypes}")
