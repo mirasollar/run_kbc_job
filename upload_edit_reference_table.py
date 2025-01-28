@@ -698,9 +698,9 @@ elif st.session_state['upload-tables']:
                                 try:
                                     df = pd.read_csv(uploaded_file, sep=None, engine='python', encoding='utf-8-sig')
                                 except:
-                                    result = from_path(uploaded_file).best()
-                                    encoding = result.encoding
-                                    st.write(f"Detected encoding: {encoding}")
+                                    # result = from_path(uploaded_file).best()
+                                    # encoding = result.encoding
+                                    # st.write(f"Detected encoding: {encoding}")
                                     df = pd.read_csv(uploaded_file, sep=None, engine='python', encoding='cp1250')
                             else:
                                 df=pd.read_excel(uploaded_file)
