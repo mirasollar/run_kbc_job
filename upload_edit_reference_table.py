@@ -711,8 +711,7 @@ elif st.session_state['upload-tables']:
                                         else:
                                             header = data[0]
                                             rows = data[1:]
-                                            df_windows_encoding = pd.DataFrame(rows, columns=header)
-                                            df = df_windows_encoding.copy()
+                                            df = pd.DataFrame(rows, columns=header)
                                             df = df.infer_objects()
                                             st.write(f"Dtypes: {df.dtypes}")
                                     except Exception as e:
