@@ -2,6 +2,7 @@ import csv
 import pandas as pd
 import io
 import streamlit as st
+from charset_normalizer import from_path
 
 uploaded_file = st.file_uploader("Upload CSV file", type=["csv"])
 
@@ -10,20 +11,9 @@ if uploaded_file is not None:
     try:
         df = pd.read_csv(io.BytesIO(file_content), sep=None, engine='python', encoding='utf-8-sig')
     except:
-        raw_data = file_content.decode("windows-1250", errors="replace")  # Nahraď špatné znaky
-        st.write("File content preview (first 500 chars):")
-        st.text(raw_data[:500])  
-        converted_file = io.StringIO(raw_data)
-        try:v
-            reader = csv.reader(converted_file, delimiter=";")
-            data = list(reader)
-            if len(data) < 2:
-                st.error("The file does not contain enough rows to extract data and header.")
-            else:
-                header = data[0]
-                rows = data[1:]
-                df = pd.DataFrame(rows, columns=header)
-        except Exception as e:
-            st.error(f"Error while processing the file: {e}")        
+        result = from_path(io.BytesIO(file_content)).best()
+        encoding = result.encoding
+        st.write(f"Detekované kodování: {encoding}")
+        df = pd.read_csv(io.BytesIO(file_content), sep=None, engine='python', encoding=encoding)       
 
-    st.write(df)
+    st.write(df.head())
