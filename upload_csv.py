@@ -13,7 +13,6 @@ if uploaded_file is not None:
     try:
         df = pd.read_csv(io.BytesIO(file_content), sep=None, engine='python', encoding='utf-8-sig')
     except:
-
         st.write(f"Detekované kodování: {encoding}")
         df = pd.read_csv(io.BytesIO(file_content), sep=None, engine='python', encoding=encoding)
         
