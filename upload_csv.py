@@ -14,6 +14,7 @@ if uploaded_file is not None:
         result = from_path(io.BytesIO(file_content)).best()
         encoding = result.encoding
         st.write(f"Detekované kodování: {encoding}")
-        df = pd.read_csv(io.BytesIO(file_content), sep=None, engine='python', encoding=encoding)       
-
-    st.write(df.head())
+        df = pd.read_csv(io.BytesIO(file_content), sep=None, engine='python', encoding=encoding)
+        
+    st.write(f"Datové typy: {df.dtypes}")
+    st.write(f"Dataframe: {df.head()}")
