@@ -8,7 +8,7 @@ uploaded_file = st.file_uploader("Upload CSV file", type=["csv"])
 
 if uploaded_file is not None:
     file_content = uploaded_file.read()
-    result = from_path(uploaded_file).best()
+    result = from_path(uploaded_file.read()).best()
     encoding = result.encoding
     st.write(f"Detekované kodování: {encoding}")
     try:
