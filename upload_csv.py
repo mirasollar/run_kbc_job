@@ -1,20 +1,22 @@
-import csv
-import pandas as pd
 import io
+from charset_normalizer import from_bytes
 import streamlit as st
-from charset_normalizer import from_path
+import pandas as pd
 
 uploaded_file = st.file_uploader("Upload CSV file", type=["csv"])
 
 if uploaded_file is not None:
-    file_content = uploaded_file.read()
-    result = from_path(uploaded_file.read()).best()
-    encoding = result.encoding
-    st.write(f"Detekované kodování: {encoding}")
+    # Načti soubor jako bytes
+    raw_data = uploaded_file.read()
+
     try:
-        df = pd.read_csv(io.BytesIO(file_content), sep=None, engine='python', encoding='utf-8-sig')
+        df = pd.read_csv(io.BytesIO(raw_data), sep=None, engine='python', encoding='utf-8-sig')
     except:
-        df = pd.read_csv(io.BytesIO(file_content), sep=None, engine='python', encoding=encoding)
-        
+        result = from_bytes(raw_data).best()
+        detected_encoding = result.encoding
+        st.write(f"Detected encoding: {detected_encoding}")
+        df = pd.read_csv(io.BytesIO(raw_data), sep=None, engine='python', encoding=detected_encoding)
+
     st.write(f"Datové typy: {df.dtypes}")
-    st.write(f"Dataframe: {df.head()}")
+
+    st.write(f"Dataframe {df.head()}")
