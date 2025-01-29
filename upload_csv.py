@@ -10,10 +10,10 @@ if uploaded_file is not None:
     file_content = uploaded_file.read()
     result = from_path(uploaded_file).best()
     encoding = result.encoding
+    st.write(f"Detekované kodování: {encoding}")
     try:
         df = pd.read_csv(io.BytesIO(file_content), sep=None, engine='python', encoding='utf-8-sig')
     except:
-        st.write(f"Detekované kodování: {encoding}")
         df = pd.read_csv(io.BytesIO(file_content), sep=None, engine='python', encoding=encoding)
         
     st.write(f"Datové typy: {df.dtypes}")
