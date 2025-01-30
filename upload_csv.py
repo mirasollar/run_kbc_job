@@ -27,4 +27,4 @@ df = pd.DataFrame(
        {"poradi": 1, "polozka_pl": "Televize", "rok": 2021},
    ]
 )
-    st.data_editor(df)
+st.data_editor(df)
