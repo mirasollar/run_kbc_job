@@ -3,7 +3,6 @@ from charset_normalizer import from_bytes
 import streamlit as st
 import pandas as pd
 
-
 uploaded_file = st.file_uploader("Upload CSV file", type=["csv"])
 
 if uploaded_file is not None:
