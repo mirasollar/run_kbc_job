@@ -19,4 +19,4 @@ if uploaded_file is not None:
 
     st.write(f"Datové typy: {df.dtypes}")
 
-    st.write(f"Dataframe {df.head()}")
+    st.data_editor(df)
