@@ -3,6 +3,7 @@ from charset_normalizer import from_bytes
 import streamlit as st
 import pandas as pd
 
+'''
 uploaded_file = st.file_uploader("Upload CSV file", type=["csv"])
 
 if uploaded_file is not None:
@@ -18,5 +19,12 @@ if uploaded_file is not None:
         df = pd.read_csv(io.BytesIO(raw_data), sep=None, engine='python', encoding=detected_encoding)
 
     st.write(f"Datové typy: {df.dtypes}")
-
+'''
+df = pd.DataFrame(
+    [
+       {"poradi": 1, "polozka_pl": "Poduct Department", "rok": 2020},
+       {"poradi": 2, "polozka_pl": "Televize", "rok": 2020},
+       {"poradi": 1, "polozka_pl": "Televize", "rok": 2021},
+   ]
+)
     st.data_editor(df)
