@@ -8,7 +8,7 @@ kbc_url = url = st.secrets["kbc_url"]
 kbc_token = st.secrets["kbc_token"]
 streamlit_protected_save = st.secrets["streamlit_protected_save"]
 
-st.write(f"KBC token: {token}")
+st.write(f"Token: {token}")
 st.write(f"KBC url: {kbc_url}")
 st.write(f"KBC token: {kbc_token}")
 st.write(f"Streamlit protected save: {streamlit_protected_save}")
@@ -29,4 +29,4 @@ if uploaded_file is not None:
 
     st.write(f"Datové typy: {df.dtypes}")
 
-st.data_editor(df)
+    st.data_editor(df)
