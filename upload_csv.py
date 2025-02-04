@@ -3,9 +3,6 @@ from charset_normalizer import from_bytes
 import streamlit as st
 import pandas as pd
 
-token = st.secrets["kbc_storage_token"]
-kbc_url = url = st.secrets["kbc_url"]
-kbc_token = st.secrets["kbc_token"]
 streamlit_protected_save = st.secrets["streamlit_protected_save"]
 
 st.write(f"Token: {token}")
