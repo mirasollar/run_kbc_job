@@ -701,6 +701,7 @@ elif st.session_state['upload-tables']:
                                 except:
                                     result = from_bytes(file_content).best()
                                     detected_encoding = result.encoding
+                                    time.sleep(5)
                                     st.write(f"Detected encoding: {detected_encoding}")
                                     df = pd.read_csv(io.BytesIO(file_content), sep=None, engine='python', encoding=detected_encoding)
                             else:
