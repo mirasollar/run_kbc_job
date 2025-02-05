@@ -699,24 +699,10 @@ elif st.session_state['upload-tables']:
                                 try:
                                     df = pd.read_csv(io.BytesIO(file_content), sep=None, engine='python', encoding='utf-8-sig')
                                 except:
-                                    raw_data = file_content.decode("windows-1250", errors="replace").replace("\r\n", "\n")
-                                    converted_file = io.StringIO(raw_data)
-                                    try:
-                                        reader = csv.reader(converted_file, delimiter=";")
-                                        data = list(reader)
-                                        if len(data) < 2:
-                                            st.error("The file does not contain enough rows to extract data and header.")
-                                        else:
-                                            header = data[0]
-                                            rows = data[1:]
-                                            df = pd.DataFrame(rows, columns=header)
-                                            for col in df.columns:
-                                                try:
-                                                    df[col] = pd.to_numeric(df[col], errors='ignore')
-                                                except:
-                                                    pass
-                                    except Exception as e:
-                                        st.error(f"Error while processing the file: {e}")  
+                                    result = from_bytes(file_content).best()
+                                    detected_encoding = result.encoding
+                                    st.write(f"Detected encoding: {detected_encoding}")
+                                    df = pd.read_csv(io.BytesIO(file_content), sep=None, engine='python', encoding=detected_encoding)
                             else:
                                 df=pd.read_excel(uploaded_file)
                             if date_setting:
