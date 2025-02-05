@@ -645,6 +645,7 @@ elif st.session_state['upload-tables']:
     if selected_bucket and selected_bucket != "Choose a bucket":
         # File uploader
         uploaded_file = st.file_uploader("Upload a file", type=['csv', 'xlsx'])
+        file_content = uploaded_file.read()
 
         # List and display available tables
         tables = client.tables.list()
@@ -695,13 +696,12 @@ elif st.session_state['upload-tables']:
                             # Save the uploaded file to a temporary path
                             temp_file_path = f"/tmp/{uploaded_file.name}"
                             if Path(uploaded_file.name).suffix == '.csv':
-                                file_content = uploaded_file.read()
+                                
                                 try:
                                     df = pd.read_csv(io.BytesIO(file_content), sep=None, engine='python', encoding='utf-8-sig')
                                 except:
                                     result = from_bytes(file_content).best()
                                     detected_encoding = result.encoding
-                                    time.sleep(5)
                                     st.write(f"Detected encoding: {detected_encoding}")
                                     df = pd.read_csv(io.BytesIO(file_content), sep=None, engine='python', encoding=detected_encoding)
                             else:
