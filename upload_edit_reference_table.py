@@ -12,7 +12,7 @@ import re
 import json
 import numpy as np
 import io
-from charset_normalizer import from_path
+from charset_normalizer import from_bytes
 
 # Setting page config
 st.set_page_config(page_title="Keboola Data Editor", page_icon=":robot:", layout="wide")
