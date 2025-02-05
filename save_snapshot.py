@@ -21,6 +21,7 @@ df = pd.DataFrame({"advertiser": ["Creditas", "Stavby, Brno"], "client_id": [4, 
 
 df_serialized = df.to_json(orient="records")
 df_snapshots = pd.DataFrame({"timestamp": [str_now_utc], "nested_df": [df_serialized]})
+st.write(df_snapshots)
 
 df_restored = pd.read_json(df_snapshots.loc[0, "nested_df"])
 st.write(df_restored)
