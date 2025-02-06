@@ -42,10 +42,6 @@ def write_to_keboola(data, table_name, table_path, incremental):
     )
 
 st.session_state['passwords_table_id'] = 'in.c-reference_tables_metadata.passwords_mso_dev_839334747'
-# st.session_state['passwords_data'] = get_password_dataframe(st.session_state['passwords_table_id'])
-# st.write(f"Passwords data: {st.session_state['passwords_data']}, data type: {type(st.session_state['passwords_data'])}")
-
-# st.data_editor(st.session_state['passwords_data'])
 
 # df = pd.DataFrame({"advertiser": ["Creditas", "Stavby, Brno"], "client_id": [4, 5]})
 
@@ -59,12 +55,12 @@ st.session_state['passwords_table_id'] = 'in.c-reference_tables_metadata.passwor
 if "passwords" not in st.session_state:
     st.session_state.passwords = get_password_dataframe(st.session_state['passwords_table_id'])
 
-def get_name_by_password(password: str) -> str | None:
+def get_username_by_password(password):
     df = st.session_state.passwords
     match = df.loc[df['password'] == password, 'name']
     return match.iloc[0] if not match.empty else None
 
-st.title("Login:")
+st.text("Ender your password:")
 
 password_input = st.text_input("Enter password:", type="password")
 if st.button("Submit"):
