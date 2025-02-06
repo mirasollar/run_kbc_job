@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import io
 import os
-from streamlit.web.server.websocket_headers import _get_websocket_headers
+# from streamlit.web.server.websocket_headers import _get_websocket_headers
 from datetime import datetime
 from datetime import timezone as dttimezone
 
@@ -20,7 +20,8 @@ str_now_utc = now_utc.strftime('%Y-%m-%d, %H:%M:%S')
 
 name = 'mirda'
 
-headers = _get_websocket_headers()
+# headers = _get_websocket_headers()
+headers = st.context.headers
 st.write(headers["Host"])
 st.write(headers["Origin"])
 
