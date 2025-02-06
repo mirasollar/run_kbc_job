@@ -8,6 +8,35 @@ from datetime import datetime
 from datetime import timezone as dttimezone
 from kbcstorage.client import Client
 
+kbc_url = url = st.secrets["kbc_url"]
+kbc_token = st.secrets["kbc_token"]
+st.write(f"KBC token: {kbc_token}")
+kbc_client = Client(kbc_url, kbc_token)
+
+now_utc = datetime.now(dttimezone.utc)
+str_now_utc = now_utc.strftime('%Y-%m-%d, %H:%M:%S')
+
+name = 'mirda'
+
+headers = st.context.headers
+st.write(headers["Host"])
+st.write(headers["Origin"])
+
+streamlit_protected_save = st.secrets["streamlit_protected_save"]
+st.write(f"Streamlit protected save: {streamlit_protected_save}")
+
+def get_password_dataframe(table_name):
+    kbc_client.tables.export_to_file(table_id = table_name, path_name='.')
+    df = pd.read_csv(f"./{table_name.split('.')[2]}", low_memory=False)
+    return df
+
+def verify_password(df_password, password):
+    if not df_password:
+        raise("Table doesn't exist.")
+    passwords_list = df_password["password"].tolist()
+    if password in passwords_list:
+        return df[df["password"] == inserted_password].loc[1, "name"]
+
 def write_to_keboola(data, table_name, table_path, incremental):
     data.to_csv(table_path, index=False, compression='gzip')
     client.tables.load(
@@ -16,35 +45,11 @@ def write_to_keboola(data, table_name, table_path, incremental):
         is_incremental=incremental
     )
 
-kbc_url = url = st.secrets["kbc_url"]
-kbc_token = st.secrets["kbc_token"]
-st.write(f"KBC token: {kbc_token}")
-kbc_client = Client(kbc_url, kbc_token)
-
-st.write(f"Table detail: {kbc_client.tables.detail('in.c-reference_tables_metadata.passwords_mso_dev_839334747')}")
-
-def get_password_dataframe(table_name):
-    kbc_client.tables.export_to_file(table_id = table_name, path_name='.')
-    df = pd.read_csv(f"./{table_name.split('.')[2]}", low_memory=False)
-    return df
-
 st.session_state['passwords'] = 'in.c-reference_tables_metadata.passwords_mso_dev_839334747'
-st.write(f"Table id: {st.session_state['passwords']}")
+# st.write(f"Table id: {st.session_state['passwords']}")
 st.session_state['passwords_data'] = get_password_dataframe(st.session_state['passwords'])
-st.write(f"Passwords data: {st.session_state['passwords_data']}")
+# st.write(f"Passwords data: {st.session_state['passwords_data']}")
 
-now_utc = datetime.now(dttimezone.utc)
-str_now_utc = now_utc.strftime('%Y-%m-%d, %H:%M:%S')
-
-name = 'mirda'
-
-# headers = _get_websocket_headers()
-headers = st.context.headers
-st.write(headers["Host"])
-st.write(headers["Origin"])
-
-streamlit_protected_save = st.secrets["streamlit_protected_save"]
-st.write(f"Streamlit protected save: {streamlit_protected_save}")
 
 df = pd.DataFrame({"advertiser": ["Creditas", "Stavby, Brno"], "client_id": [4, 5]})
 
@@ -54,6 +59,16 @@ st.write(df_snapshots)
 
 df_restored = pd.read_json(df_snapshots.loc[0, "nested_df"])
 st.write(df_restored)
+
+inserted_password = 'pis1'
+
+if inserted_password:
+    name = verify_password(st.session_state['passwords_data'], inserted_password)
+    if name:
+        st.success(f"Hi, {name}, access granted! You can now save the file.")
+    else:
+        st.error("Invalid password!")
+
 
 # write_to_keboola(edited_data, st.session_state["selected-table"],f'updated_data.csv.gz', False)
 
