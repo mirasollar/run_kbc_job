@@ -46,7 +46,7 @@ st.session_state['passwords'] = 'in.c-reference_tables_metadata.passwords_mso_de
 st.session_state['passwords_data'] = get_password_dataframe(st.session_state['passwords'])
 st.write(f"Passwords data: {st.session_state['passwords_data']}, data type: {type(st.session_state['passwords_data'])}")
 
-st.editor(st.session_state['passwords_data'])
+st.data_editor(st.session_state['passwords_data'])
 
 # df = pd.DataFrame({"advertiser": ["Creditas", "Stavby, Brno"], "client_id": [4, 5]})
 
