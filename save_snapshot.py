@@ -36,7 +36,6 @@ def get_dataframe(table_name):
     
     os.rename(table_detail['name'], 'data.csv')
     df = pd.read_csv('data.csv')
-    df = cast_columns(df)
     return df
 
 
