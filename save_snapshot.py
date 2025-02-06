@@ -41,12 +41,11 @@ def write_to_keboola(data, table_name, table_path, incremental):
         is_incremental=incremental
     )
 
-st.session_state['passwords'] = 'in.c-reference_tables_metadata.passwords_mso_dev_839334747'
-# st.write(f"Table id: {st.session_state['passwords']}")
-st.session_state['passwords_data'] = get_password_dataframe(st.session_state['passwords'])
-st.write(f"Passwords data: {st.session_state['passwords_data']}, data type: {type(st.session_state['passwords_data'])}")
+st.session_state['passwords_table_id'] = 'in.c-reference_tables_metadata.passwords_mso_dev_839334747'
+# st.session_state['passwords_data'] = get_password_dataframe(st.session_state['passwords_table_id'])
+# st.write(f"Passwords data: {st.session_state['passwords_data']}, data type: {type(st.session_state['passwords_data'])}")
 
-st.data_editor(st.session_state['passwords_data'])
+# st.data_editor(st.session_state['passwords_data'])
 
 # df = pd.DataFrame({"advertiser": ["Creditas", "Stavby, Brno"], "client_id": [4, 5]})
 
@@ -57,11 +56,23 @@ st.data_editor(st.session_state['passwords_data'])
 # df_restored = pd.read_json(df_snapshots.loc[0, "nested_df"])
 # st.write(df_restored)
 
-inserted_password = st.text_input("Enter password:", type="password")
+if "passwords" not in st.session_state:
+    st.session_state.passwords = get_password_dataframe(st.session_state['passwords_table_id'])
 
-if inserted_password:
-    name = st.session_state['passwords_data'].loc[st.session_state['passwords_data']['password'] == password, 'name']
-    st.write(f"Name from password: {name}")
+def get_name_by_password(password: str) -> str | None:
+    df = st.session_state.passwords
+    match = df.loc[df['password'] == password, 'name']
+    return match.iloc[0] if not match.empty else None
+
+st.title("Login:")
+
+password_input = st.text_input("Enter password:", type="password")
+if st.button("Submit"):
+    name = get_name_by_password(password_input)
+    if name:
+        st.success(f"Welcome, {name}!")
+    else:
+        st.error("Invalid password")
 
 
 # write_to_keboola(edited_data, st.session_state["selected-table"],f'updated_data.csv.gz', False)
