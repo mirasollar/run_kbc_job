@@ -33,7 +33,7 @@ def get_password_dataframe(table_name):
 def verify_password(password, df_password):
     passwords_list = df_password["password"].tolist()
     if password in passwords_list:
-        return df_password[df_password["password"] == inserted_password].loc[1, "name"]
+        return df_password[df_password["password"] == password].loc[1, "name"]
 
 def write_to_keboola(data, table_name, table_path, incremental):
     data.to_csv(table_path, index=False, compression='gzip')
