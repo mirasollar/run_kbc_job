@@ -60,7 +60,7 @@ st.data_editor(st.session_state['passwords_data'])
 inserted_password = st.text_input("Enter password:", type="password")
 
 if inserted_password:
-    name = st.session_state['passwords_data'].loc[st.session_state['passwords_data']['password'] == password, 'name'].iloc[0]
+    name = st.session_state['passwords_data'].loc[st.session_state['passwords_data']['password'] == password, 'name']
     st.write(f"Name from password: {name}")
 
 
