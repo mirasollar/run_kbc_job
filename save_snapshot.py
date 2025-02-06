@@ -24,7 +24,7 @@ kbc_client = Client(kbc_url, kbc_token)
 st.write(f"Table detail: {kbc_client.tables.detail('in.c-reference_tables_metadata.passwords_mso_dev_839334747')}")
 
 def get_password_dataframe(table_name):
-    client.tables.export_to_file(table_id = table_name, path_name='.')
+    kbc_client.tables.export_to_file(table_id = table_name, path_name='.')
     df = pd.read_csv(f"./{table_id.split('.')[2]}", low_memory=False)
     return df
 
