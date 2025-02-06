@@ -18,7 +18,10 @@ def write_to_keboola(data, table_name, table_path, incremental):
 
 kbc_url = url = st.secrets["kbc_url"]
 kbc_token = st.secrets["kbc_token"]
+st.write(f"KBC token: {kbc_token}")
 kbc_client = Client(kbc_url, kbc_token)
+
+st.write(f"Table detail: {kbc_client.tables.detail('in.c-reference_tables_metadata.passwords_mso_dev_839334747')}")
 
 def get_dataframe(table_name):
     table_detail = kbc_client.tables.detail(table_name)
@@ -29,19 +32,19 @@ def get_dataframe(table_name):
     with open('./' + table_detail['name'], mode='rt', encoding='utf-8') as in_file:
         lazy_lines = (line.replace('\0', '') for line in in_file)
         reader = csv.reader(lazy_lines, lineterminator='\n')
-    if os.path.exists('data.csv'):
-        os.remove('data.csv')
+    if os.path.exists('passwords_data.csv'):
+        os.remove('passwords_data.csv')
     else:
         print("The file does not exist")
     
-    os.rename(table_detail['name'], 'data.csv')
-    df = pd.read_csv('data.csv')
+    os.rename(table_detail['name'], 'passwords_data.csv')
+    df = pd.read_csv('passwords_data.csv')
     return df
 
 
-st.session_state['passwords'] = 'in.c-reference_tables_metadata.passwords_mso_dev_839334747'
-st.session_state['passwords_data'] = get_dataframe(st.session_state['passwords'])
-st.write(st.session_state['passwords_data'])
+# st.session_state['passwords'] = 'in.c-reference_tables_metadata.passwords_mso_dev_839334747'
+# st.session_state['passwords_data'] = get_dataframe(st.session_state['passwords'])
+# st.write(st.session_state['passwords_data'])
 
 now_utc = datetime.now(dttimezone.utc)
 str_now_utc = now_utc.strftime('%Y-%m-%d, %H:%M:%S')
