@@ -30,12 +30,10 @@ def get_password_dataframe(table_name):
     df = pd.read_csv(f"./{table_name.split('.')[2]}", low_memory=False)
     return df
 
-def verify_password(df_password, password):
-    if not df_password:
-        raise("Table doesn't exist.")
+def verify_password(password, df_password):
     passwords_list = df_password["password"].tolist()
     if password in passwords_list:
-        return df[df["password"] == inserted_password].loc[1, "name"]
+        return df_password[df_password["password"] == inserted_password].loc[1, "name"]
 
 def write_to_keboola(data, table_name, table_path, incremental):
     data.to_csv(table_path, index=False, compression='gzip')
@@ -63,7 +61,7 @@ st.write(df_restored)
 inserted_password = 'pis1'
 
 if inserted_password:
-    name = verify_password(st.session_state['passwords_data'], inserted_password)
+    name = verify_password(inserted_password, st.session_state['passwords_data'])
     if name:
         st.success(f"Hi, {name}, access granted! You can now save the file.")
     else:
