@@ -58,7 +58,7 @@ st.write(df_snapshots)
 df_restored = pd.read_json(df_snapshots.loc[0, "nested_df"])
 st.write(df_restored)
 
-inserted_password = 'pis1'
+inserted_password = st.text_input("Enter password:", type="password")
 
 if inserted_password:
     name = verify_password(inserted_password, st.session_state['passwords_data'])
