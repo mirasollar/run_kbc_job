@@ -25,24 +25,22 @@ st.write(f"Table detail: {kbc_client.tables.detail('in.c-reference_tables_metada
 
 def get_dataframe(table_name):
     table_detail = kbc_client.tables.detail(table_name)
-
     kbc_client.tables.export_to_file(table_id = table_name, path_name='')
     list = kbc_client.tables.list()
-    
     with open('./' + table_detail['name'], mode='rt', encoding='utf-8') as in_file:
         lazy_lines = (line.replace('\0', '') for line in in_file)
         reader = csv.reader(lazy_lines, lineterminator='\n')
-    if os.path.exists('passwords_data.csv'):
-        os.remove('passwords_data.csv')
+    if os.path.exists('data.csv'):
+        os.remove('data.csv')
     else:
         print("The file does not exist")
-    
-    os.rename(table_detail['name'], 'passwords_data.csv')
-    df = pd.read_csv('passwords_data.csv')
+    os.rename(table_detail['name'], 'data.csv')
+    df = pd.read_csv('data.csv')
     return df
 
 
-# st.session_state['passwords'] = 'in.c-reference_tables_metadata.passwords_mso_dev_839334747'
+st.session_state['passwords'] = 'in.c-reference_tables_metadata.passwords_mso_dev_839334747'
+st.write(f"Table id: {st.session_state['passwords']}")
 # st.session_state['passwords_data'] = get_dataframe(st.session_state['passwords'])
 # st.write(st.session_state['passwords_data'])
 
