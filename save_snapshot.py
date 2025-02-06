@@ -46,7 +46,7 @@ def write_to_keboola(data, table_name, table_path, incremental):
 st.session_state['passwords'] = 'in.c-reference_tables_metadata.passwords_mso_dev_839334747'
 # st.write(f"Table id: {st.session_state['passwords']}")
 st.session_state['passwords_data'] = get_password_dataframe(st.session_state['passwords'])
-# st.write(f"Passwords data: {st.session_state['passwords_data']}")
+st.write(f"Passwords data: {st.session_state['passwords_data']}")
 
 
 df = pd.DataFrame({"advertiser": ["Creditas", "Stavby, Brno"], "client_id": [4, 5]})
@@ -62,6 +62,7 @@ inserted_password = st.text_input("Enter password:", type="password")
 
 if inserted_password:
     name = verify_password(inserted_password, st.session_state['passwords_data'])
+    st.write(f"Name from password: {name}")
     if name:
         st.success(f"Hi, {name}, access granted! You can now save the file.")
     else:
