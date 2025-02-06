@@ -41,8 +41,8 @@ def get_dataframe(table_name):
 
 st.session_state['passwords'] = 'in.c-reference_tables_metadata.passwords_mso_dev_839334747'
 st.write(f"Table id: {st.session_state['passwords']}")
-# st.session_state['passwords_data'] = get_dataframe(st.session_state['passwords'])
-# st.write(st.session_state['passwords_data'])
+st.session_state['passwords_data'] = get_dataframe(st.session_state['passwords'])
+st.write(f"Passwords data: {st.session_state['passwords_data']}")
 
 now_utc = datetime.now(dttimezone.utc)
 str_now_utc = now_utc.strftime('%Y-%m-%d, %H:%M:%S')
