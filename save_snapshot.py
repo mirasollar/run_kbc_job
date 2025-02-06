@@ -5,6 +5,7 @@ import os
 # from streamlit.web.server.websocket_headers import _get_websocket_headers
 from datetime import datetime
 from datetime import timezone as dttimezone
+from kbcstorage.client import Client
 
 def write_to_keboola(data, table_name, table_path, incremental):
     data.to_csv(table_path, index=False, compression='gzip')
@@ -13,6 +14,10 @@ def write_to_keboola(data, table_name, table_path, incremental):
         file_path=table_path,
         is_incremental=incremental
     )
+
+kbc_url = url = st.secrets["kbc_url"]
+kbc_token = st.secrets["kbc_token"]
+kbc_client = Client(kbc_url, kbc_token)
 
 
 now_utc = datetime.now(dttimezone.utc)
