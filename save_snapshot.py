@@ -39,7 +39,7 @@ def verify_password(password, df_password):
 
 def write_to_keboola(data, table_name, table_path, incremental):
     data.to_csv(table_path, index=False, compression='gzip')
-    client.tables.load(
+    kbc_client.tables.load(
         table_id=table_name,
         file_path=table_path,
         is_incremental=incremental
@@ -62,13 +62,14 @@ def get_username_by_password(password):
     match = df.loc[df['password'] == password, 'name']
     return match.iloc[0] if not match.empty else None
 
-st.text("Ender your password:")
+st.write(f"All files: {os.listdir()}")
 
 password_input = st.text_input("Enter password:", type="password")
 if st.button("Submit"):
     name = get_username_by_password(password_input)
     if name:
-        write_to_keboola(df_snapshots, st.session_state['snapshots_table_id'],f'updated_data.csv.gz', True)
+        st.write("success")
+        # write_to_keboola(df_snapshots, st.session_state['snapshots_table_id'],f'updated_data.csv.gz', True)
     else:
         st.error("Invalid password")
 
