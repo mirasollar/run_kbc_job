@@ -22,15 +22,12 @@ headers = st.context.headers
 table_name_suffix = re.sub('-', '_', headers['Host'].split('.')[0])
 st.write(f"table_name_suffix: {table_name_suffix}")
 
-streamlit_protected_save = st.secrets["streamlit_protected_save"]
-
 try:
-    streamlit_something = st.secrets["streamlit_something"]
+    streamlit_protected_save = st.secrets["streamlit_protected_save"]
 except:
-    streamlit_something = 'False'
+    streamlit_protected_save = 'False'
     
 st.write(f"Streamlit protected save: {streamlit_protected_save}")
-st.write(f"Streamlit protected save: {streamlit_something}")
 
 def get_password_dataframe(table_name):
     kbc_client.tables.export_to_file(table_id = table_name, path_name='.')
@@ -49,6 +46,7 @@ def write_to_keboola(data, table_name, table_path, incremental):
     )
 
 st.session_state['passwords_table_id'] = f"in.c-reference_tables_metadata.passwords_{table_name_suffix}"
+st.session_state['snapshots_table_id'] = f"in.c-reference_tables_metadata.snapshots_{table_name_suffix}"
 
 df = pd.DataFrame({"advertiser": ["Creditas", "Stavby, Brno"], "client_id": [4, 5]})
 
@@ -70,7 +68,7 @@ password_input = st.text_input("Enter password:", type="password")
 if st.button("Submit"):
     name = get_username_by_password(password_input)
     if name:
-        st.success(f"Welcome, {name}!")
+        write_to_keboola(df_snapshots, st.session_state['snapshots_table_id'],f'updated_data.csv.gz', True)
     else:
         st.error("Invalid password")
 
