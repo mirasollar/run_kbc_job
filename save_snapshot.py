@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import re
 import io
 import os
 import csv
@@ -19,8 +20,7 @@ str_now_utc = now_utc.strftime('%Y-%m-%d, %H:%M:%S')
 name = 'mirda'
 
 headers = st.context.headers
-st.write(headers["Host"])
-st.write(headers["Origin"])
+st.write(f"Table name: {re.sub('-', '_', headers["Host"].split('.')[0])}")
 
 streamlit_protected_save = st.secrets["streamlit_protected_save"]
 st.write(f"Streamlit protected save: {streamlit_protected_save}")
