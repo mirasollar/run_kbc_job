@@ -26,7 +26,7 @@ streamlit_protected_save = st.secrets["streamlit_protected_save"]
 
 try:
     streamlit_something = st.secrets["streamlit_something"]
-else:
+except:
     streamlit_something = 'False'
     
 st.write(f"Streamlit protected save: {streamlit_protected_save}")
