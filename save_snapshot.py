@@ -11,7 +11,6 @@ from kbcstorage.client import Client
 
 kbc_url = url = st.secrets["kbc_url"]
 kbc_token = st.secrets["kbc_token"]
-st.write(f"KBC token: {kbc_token}")
 kbc_client = Client(kbc_url, kbc_token)
 
 now_utc = datetime.now(dttimezone.utc)
@@ -20,7 +19,8 @@ str_now_utc = now_utc.strftime('%Y-%m-%d, %H:%M:%S')
 name = 'mirda'
 
 headers = st.context.headers
-st.write(f"Table name: {re.sub('-', '_', headers['Host'].split('.')[0])}")
+table_name_suffix = re.sub('-', '_', headers['Host'].split('.')[0])
+st.write(f"table_name_suffix: {table_name_suffix}")
 
 streamlit_protected_save = st.secrets["streamlit_protected_save"]
 st.write(f"Streamlit protected save: {streamlit_protected_save}")
@@ -41,16 +41,13 @@ def write_to_keboola(data, table_name, table_path, incremental):
         is_incremental=incremental
     )
 
-st.session_state['passwords_table_id'] = 'in.c-reference_tables_metadata.passwords_mso_dev_839334747'
+st.session_state['passwords_table_id'] = f"in.c-reference_tables_metadata.{table_name_suffix}"
 
-# df = pd.DataFrame({"advertiser": ["Creditas", "Stavby, Brno"], "client_id": [4, 5]})
+df = pd.DataFrame({"advertiser": ["Creditas", "Stavby, Brno"], "client_id": [4, 5]})
 
-# df_serialized = df.to_json(orient="records")
-# df_snapshots = pd.DataFrame({"name": [name], "timestamp": [str_now_utc], "nested_df": [df_serialized]})
-# st.write(df_snapshots)
-
-# df_restored = pd.read_json(df_snapshots.loc[0, "nested_df"])
-# st.write(df_restored)
+df_serialized = df.to_json(orient="records")
+df_snapshots = pd.DataFrame({"name": [name], "timestamp": [str_now_utc], "nested_df": [df_serialized]})
+st.write(df_snapshots)
 
 if "passwords" not in st.session_state:
     st.session_state.passwords = get_password_dataframe(st.session_state['passwords_table_id'])
