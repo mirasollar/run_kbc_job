@@ -64,7 +64,7 @@ st.text("Ender your password:")
 
 password_input = st.text_input("Enter password:", type="password")
 if st.button("Submit"):
-    name = get_name_by_password(password_input)
+    name = get_username_by_password(password_input)
     if name:
         st.success(f"Welcome, {name}!")
     else:
