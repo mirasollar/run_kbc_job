@@ -23,8 +23,14 @@ table_name_suffix = re.sub('-', '_', headers['Host'].split('.')[0])
 st.write(f"table_name_suffix: {table_name_suffix}")
 
 streamlit_protected_save = st.secrets["streamlit_protected_save"]
-streamlit_protected_save = st.secrets["streamlit_something"]
+
+try:
+    streamlit_something = st.secrets["streamlit_something"]
+else:
+    streamlit_something = 'False'
+    
 st.write(f"Streamlit protected save: {streamlit_protected_save}")
+st.write(f"Streamlit protected save: {streamlit_something}")
 
 def get_password_dataframe(table_name):
     kbc_client.tables.export_to_file(table_id = table_name, path_name='.')
