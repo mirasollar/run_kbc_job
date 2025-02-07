@@ -69,7 +69,7 @@ if st.button("Submit"):
     name = get_username_by_password(password_input)
     if name:
         st.write("success")
-        # write_to_keboola(df_snapshots, st.session_state['snapshots_table_id'],f'updated_data.csv.gz', True)
+        write_to_keboola(df_snapshots, st.session_state['snapshots_table_id'],f'snapshot_data.csv.gz', True)
     else:
         st.error("Invalid password")
 
