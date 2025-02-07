@@ -41,7 +41,7 @@ def write_to_keboola(data, table_name, table_path, incremental):
         is_incremental=incremental
     )
 
-st.session_state['passwords_table_id'] = f"in.c-reference_tables_metadata.{table_name_suffix}"
+st.session_state['passwords_table_id'] = f"in.c-reference_tables_metadata.passwords_{table_name_suffix}"
 
 df = pd.DataFrame({"advertiser": ["Creditas", "Stavby, Brno"], "client_id": [4, 5]})
 
