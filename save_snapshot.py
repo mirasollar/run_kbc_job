@@ -23,6 +23,7 @@ table_name_suffix = re.sub('-', '_', headers['Host'].split('.')[0])
 st.write(f"table_name_suffix: {table_name_suffix}")
 
 streamlit_protected_save = st.secrets["streamlit_protected_save"]
+streamlit_protected_save = st.secrets["streamlit_something"]
 st.write(f"Streamlit protected save: {streamlit_protected_save}")
 
 def get_password_dataframe(table_name):
