@@ -37,8 +37,8 @@ def get_password_dataframe(table_name):
 def verify_password(password, df_password):
     return df_password[df_password["password"] == password].loc[1, "name"]
 
-def write_snapshot_to_keboola():
-    df_snapshots.to_csv('snapshot_data.csv.gz', index=False, compression='gzip')
+def write_snapshot_to_keboola(df_to_write):
+    df_to_write.to_csv('snapshot_data.csv.gz', index=False, compression='gzip')
     kbc_client.tables.load(
         table_id=st.session_state['snapshots_table_id'],
         file_path='snapshot_data.csv.gz',
@@ -65,9 +65,9 @@ if st.button("Submit"):
         st.write("success")
         df = pd.DataFrame({'advertiser': ['Creditas', 'Stavby "Domů", Brno'], 'client_id': [4, 5]})
         df_serialized = df.to_json(orient="records")
-        df_snapshots = pd.DataFrame({"name": [name], "timestamp": [str_now_utc], "table": [df_serialized]})
-        st.write(df_snapshots)
-        write_snapshot_to_keboola()
+        df_snapshot = pd.DataFrame({"name": [name], "timestamp": [str_now_utc], "table": [df_serialized]})
+        st.write(df_snapshot)
+        write_snapshot_to_keboola(df_snapshot)
     else:
         st.error("Invalid password")
 
