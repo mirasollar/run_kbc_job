@@ -28,15 +28,14 @@ def get_password_dataframe(table_name):
 def verify_password(password, df_password):
     return df_password[df_password["password"] == password].loc[1, "name"]
 
-def get_username_by_password(password):
-    df = st.session_state.passwords
-    match = df.loc[df['password'] == password, 'name']
+def get_username_by_password(password, df_passwords):
+    match = df_passwords.loc[df_passwords['password'] == password, 'name']
     return match.iloc[0] if not match.empty else None
 
 def write_snapshot_to_keboola(df_to_write):
     df_to_write.to_csv('snapshot_data.csv.gz', index=False, compression='gzip')
     kbc_client.tables.load(
-        table_id=st.session_state['snapshots_table_id'],
+        table_id=f"in.c-reference_tables_metadata.snapshots_{get_table_name_suffix()}",
         file_path='snapshot_data.csv.gz',
         is_incremental=True)
 
@@ -45,15 +44,16 @@ try:
 except:
     streamlit_protected_save = 'False'
 
-st.session_state['passwords_table_id'] = f"in.c-reference_tables_metadata.passwords_{get_table_name_suffix()}"
-st.session_state['snapshots_table_id'] = f"in.c-reference_tables_metadata.snapshots_{get_table_name_suffix()}"
+# st.session_state['passwords_table_id'] = f"in.c-reference_tables_metadata.passwords_{get_table_name_suffix()}"
+# st.session_state['snapshots_table_id'] = f"in.c-reference_tables_metadata.snapshots_{get_table_name_suffix()}"
 
-if "passwords" not in st.session_state:
-    st.session_state.passwords = get_password_dataframe(st.session_state['passwords_table_id'])
+
 
 password_input = st.text_input("Enter password:", type="password")
 if st.button("Submit"):
-    name = get_username_by_password(password_input)
+    if "passwords" not in st.session_state:
+        st.session_state.passwords = get_password_dataframe(f"in.c-reference_tables_metadata.passwords_{get_table_name_suffix()}")
+    name = get_username_by_password(password_input, st.session_state.passwords)
     if name:
         st.write(f"Password is correct. Hello, {name}!")
         # df = pd.DataFrame({'advertiser': ['Creditas', 'Stavby "Domů", Brno'], 'client_id': [4, 5]})
