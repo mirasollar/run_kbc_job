@@ -54,7 +54,7 @@ password_input = st.text_input("Enter password:", type="password")
 if st.button("Submit"):
     if "passwords" not in st.session_state:
         st.session_state['passwords'] = get_password_dataframe(f"in.c-reference_tables_metadata.passwords_{get_table_name_suffix()}")
-    if "user_name" not in st.session_state:
+    if st.session_state['user_name'] == "":
         st.session_state['user_name'] = get_username_by_password(password_input, st.session_state['passwords'])
     if st.session_state['user_name']:
         st.write(f"Password is correct. Hello, {name}!")
