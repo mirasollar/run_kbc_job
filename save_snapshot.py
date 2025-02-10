@@ -25,8 +25,8 @@ def get_password_dataframe(table_name):
     kbc_client.tables.export_to_file(table_id = table_name, path_name='.')
     return pd.read_csv(f"./{table_name.split('.')[2]}", low_memory=False)
 
-def verify_password(password, df_password):
-    return df_password[df_password["password"] == password].loc[1, "name"]
+# def verify_password(password, df_password):
+#    return df_password[df_password["password"] == password].loc[1, "name"]
 
 def get_username_by_password(password, df_passwords):
     match = df_passwords.loc[df_passwords['password'] == password, 'name']
