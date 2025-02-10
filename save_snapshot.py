@@ -49,11 +49,12 @@ password_input = st.text_input("Enter password:", type="password")
 if st.button("Submit"):
     if "passwords" not in st.session_state:
         st.session_state['passwords'] = get_password_dataframe(f"in.c-reference_tables_metadata.passwords_{get_table_name_suffix()}")
-    name = get_username_by_password(password_input, st.session_state['passwords'])
-    if name:
+    if "user_name" not in st.session_state:
+        st.session_state['user_name'] = get_username_by_password(password_input, st.session_state['passwords'])
+    if st.session_state['user_name']:
         st.write(f"Password is correct. Hello, {name}!")
         df_serialized = df.to_json(orient="records")
-        df_snapshot = pd.DataFrame({"name": [name], "timestamp": [get_now_utc()], "table": [df_serialized]})
+        df_snapshot = pd.DataFrame({"name": [st.session_state['user_name']], "timestamp": [get_now_utc()], "table": [df_serialized]})
         st.write(df_snapshot)
         write_snapshot_to_keboola(df_snapshot)
     else:
