@@ -37,21 +37,18 @@ def get_password_dataframe(table_name):
 def verify_password(password, df_password):
     return df_password[df_password["password"] == password].loc[1, "name"]
 
-def write_to_keboola(data, table_name, table_path, incremental):
-    data.to_csv(table_path, index=False, compression='gzip')
+def write_snapshot_to_keboola():
+    df_snapshots.to_csv('snapshot_data.csv.gz', index=False, compression='gzip')
     kbc_client.tables.load(
-        table_id=table_name,
-        file_path=table_path,
-        is_incremental=incremental
+        table_id=st.session_state['snapshots_table_id'],
+        file_path='snapshot_data.csv.gz',
+        is_incremental=True
     )
 
 st.session_state['passwords_table_id'] = f"in.c-reference_tables_metadata.passwords_{table_name_suffix}"
 st.session_state['snapshots_table_id'] = f"in.c-reference_tables_metadata.snapshots_{table_name_suffix}"
 
-df = pd.DataFrame({"advertiser": ["Creditas", "Stavby, Brno"], "client_id": [4, 5]})
-df_serialized = df.to_json(orient="records")
-df_snapshots = pd.DataFrame({"name": [name], "timestamp": [str_now_utc], "table": [df_serialized]})
-st.write(df_snapshots)
+
 
 if "passwords" not in st.session_state:
     st.session_state.passwords = get_password_dataframe(st.session_state['passwords_table_id'])
@@ -68,11 +65,13 @@ if st.button("Submit"):
     name = get_username_by_password(password_input)
     if name:
         st.write("success")
-        write_to_keboola(df_snapshots, st.session_state['snapshots_table_id'],f'snapshot_data.csv.gz', True)
+        df = pd.DataFrame({"advertiser": ["Creditas", "Stavby, Brno"], "client_id": [4, 5]})
+        df_serialized = df.to_json(orient="records")
+        df_snapshots = pd.DataFrame({"name": [name], "timestamp": [str_now_utc], "table": [df_serialized]})
+        st.write(df_snapshots)
+        write_snapshot_to_keboola()
     else:
         st.error("Invalid password")
 
-
-# write_to_keboola(edited_data, st.session_state["selected-table"],f'updated_data.csv.gz', False)
 
 # uploaded_file = st.file_uploader("Upload CSV file", type=["csv"])
