@@ -48,8 +48,6 @@ def write_snapshot_to_keboola():
 st.session_state['passwords_table_id'] = f"in.c-reference_tables_metadata.passwords_{table_name_suffix}"
 st.session_state['snapshots_table_id'] = f"in.c-reference_tables_metadata.snapshots_{table_name_suffix}"
 
-
-
 if "passwords" not in st.session_state:
     st.session_state.passwords = get_password_dataframe(st.session_state['passwords_table_id'])
 
@@ -65,7 +63,7 @@ if st.button("Submit"):
     name = get_username_by_password(password_input)
     if name:
         st.write("success")
-        df = pd.DataFrame({"advertiser": ["Creditas", "Stavby, Brno"], "client_id": [4, 5]})
+        df = pd.DataFrame({'advertiser': ['Creditas', 'Stavby, Brno'], "client_id': [4, 5]})
         df_serialized = df.to_json(orient="records")
         df_snapshots = pd.DataFrame({"name": [name], "timestamp": [str_now_utc], "table": [df_serialized]})
         st.write(df_snapshots)
