@@ -56,6 +56,7 @@ if st.button("Submit"):
         st.session_state['passwords'] = get_password_dataframe(f"in.c-reference_tables_metadata.passwords_{get_table_name_suffix()}")
     if st.session_state['user_name'] == "":
         st.session_state['user_name'] = get_username_by_password(password_input, st.session_state['passwords'])
+        st.write(st.session_state['user_name'])
     if st.session_state['user_name'] != None:
         st.write(f"Password is correct. Hello, {st.session_state['user_name']}!")
         df_serialized = df.to_json(orient="records")
