@@ -44,6 +44,9 @@ def write_snapshot_to_keboola(df_to_write):
 df = pd.DataFrame({'advertiser': ['Creditas', 'Stavby "Domů", Brno'], 'client_id': [4, 5]})
 st.write(f"Dataframe s daty: {df}")
 
+if st.session_state['user_name']:
+    st.write(f"User name: {st.session_state['user_name']}")
+    
 password_input = st.text_input("Enter password:", type="password")
 
 if st.button("Submit"):
