@@ -57,7 +57,7 @@ if st.button("Submit"):
     if st.session_state['user_name'] == "":
         st.session_state['user_name'] = get_username_by_password(password_input, st.session_state['passwords'])
     if st.session_state['user_name'] != "":
-        st.write(f"Password is correct. Hello, {name}!")
+        st.write(f"Password is correct. Hello, {st.session_state['user_name']}!")
         df_serialized = df.to_json(orient="records")
         df_snapshot = pd.DataFrame({"name": [st.session_state['user_name']], "timestamp": [get_now_utc()], "table": [df_serialized]})
         st.write(df_snapshot)
