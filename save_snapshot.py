@@ -44,11 +44,6 @@ try:
 except:
     streamlit_protected_save = 'False'
 
-# st.session_state['passwords_table_id'] = f"in.c-reference_tables_metadata.passwords_{get_table_name_suffix()}"
-# st.session_state['snapshots_table_id'] = f"in.c-reference_tables_metadata.snapshots_{get_table_name_suffix()}"
-
-
-
 password_input = st.text_input("Enter password:", type="password")
 if st.button("Submit"):
     if "passwords" not in st.session_state:
