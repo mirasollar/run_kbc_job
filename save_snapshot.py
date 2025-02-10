@@ -8,6 +8,7 @@ import csv
 from datetime import datetime
 from datetime import timezone as dttimezone
 from kbcstorage.client import Client
+import numpy as np
 
 kbc_url = url = st.secrets["kbc_url"]
 kbc_token = st.secrets["kbc_token"]
@@ -63,7 +64,8 @@ if st.button("Submit"):
     name = get_username_by_password(password_input)
     if name:
         st.write("success")
-        df = pd.DataFrame({'advertiser': ['Creditas', 'Stavby "Domů", Brno'], 'client_id': [4, 5]})
+        # df = pd.DataFrame({'advertiser': ['Creditas', 'Stavby "Domů", Brno'], 'client_id': [4, 5]})
+        df = pd.DataFrame(np.random.randn(10000, 5), columns = list("abcde"))
         df_serialized = df.to_json(orient="records")
         df_snapshot = pd.DataFrame({"name": [name], "timestamp": [str_now_utc], "table": [df_serialized]})
         st.write(df_snapshot)
