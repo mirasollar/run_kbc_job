@@ -60,7 +60,7 @@ if st.session_state['user_name'] == None:
             st.error("Invalid password")
 
 if st.session_state['user_name'] != None:
-    st.success("✅ You are logged in!")
+    st.success(f"✅ Hi, {st.session_state['user_name']}. You are logged in!")
     if st.button("Save Table"):
         df_serialized = df.to_json(orient="records")
         df_snapshot = pd.DataFrame({"name": [st.session_state['user_name']], "timestamp": [get_now_utc()], "table": [df_serialized]})
