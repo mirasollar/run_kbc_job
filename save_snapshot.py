@@ -44,21 +44,27 @@ def write_snapshot_to_keboola(df_to_write):
 df = pd.DataFrame({'advertiser': ['Creditas', 'Stavby "Domů", Brno'], 'client_id': [4, 5]})
 st.write(f"Dataframe s daty: {df}")
 
+if "passwords" not in st.session_state:
+    st.session_state['passwords'] = get_password_dataframe(f"in.c-reference_tables_metadata.passwords_{get_table_name_suffix()}")
+
 if "user_name" not in st.session_state:
     st.session_state['user_name'] = None
-    
-password_input = st.text_input("Enter password:", type="password")
 
-if st.button("Submit"):
-    if "passwords" not in st.session_state:
-        st.session_state['passwords'] = get_password_dataframe(f"in.c-reference_tables_metadata.passwords_{get_table_name_suffix()}")
-    st.session_state['user_name'] = get_username_by_password(password_input, st.session_state['passwords'])
-    st.write(f"User name: {st.session_state['user_name']}")
-    if st.session_state['user_name'] != None:
-        st.write(f"Password is correct. Hello, {st.session_state['user_name']}!")
+if st.session_state['user_name'] == None:
+    password_input = st.text_input("Enter password:", type="password")
+    if st.button("Login"):
+        st.session_state['user_name'] = get_username_by_password(password_input, st.session_state['passwords'])
+        if st.session_state['user_name'] != None:
+            st.write(f"Password is correct. Hello, {st.session_state['user_name']}!")
+            st.rerun()
+        else:
+            st.error("Invalid password")
+
+if st.session_state['user_name'] != None:
+    st.success("✅ You are logged in!")
+    if st.button("Save Table"):
         df_serialized = df.to_json(orient="records")
         df_snapshot = pd.DataFrame({"name": [st.session_state['user_name']], "timestamp": [get_now_utc()], "table": [df_serialized]})
         st.write(df_snapshot)
         write_snapshot_to_keboola(df_snapshot)
-    else:
-        st.error("Invalid password")
+        st.success("Table saved successfully!")
