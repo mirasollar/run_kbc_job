@@ -4,4 +4,3 @@ streamlit_card
 extra-streamlit-components
 openpyxl
 charset_normalizer
-streamlit_js_eval
