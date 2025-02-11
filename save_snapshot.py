@@ -44,13 +44,12 @@ def write_snapshot_to_keboola(df_to_write):
 df = pd.DataFrame({'advertiser': ['Creditas', 'Stavby "Domů", Brno'], 'client_id': [4, 5]})
 st.write(f"Dataframe s daty: {df}")
 
-if "passwords" not in st.session_state:
-    st.session_state['passwords'] = get_password_dataframe(f"in.c-reference_tables_metadata.passwords_{get_table_name_suffix()}")
-
 if "user_name" not in st.session_state:
     st.session_state['user_name'] = None
 
 if st.session_state['user_name'] == None:
+    if "passwords" not in st.session_state:
+        st.session_state['passwords'] = get_password_dataframe(f"in.c-reference_tables_metadata.passwords_{get_table_name_suffix()}")
     password_input = st.text_input("Enter password:", type="password")
     if st.button("Login"):
         st.session_state['user_name'] = get_username_by_password(password_input, st.session_state['passwords'])
