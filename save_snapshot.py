@@ -8,32 +8,6 @@ from datetime import datetime
 from datetime import timezone as dttimezone
 from kbcstorage.client import Client
 import numpy as np
-from streamlit_js_eval import streamlit_js_eval
-
-CORRECT_PASSWORD = "tajneheslo"
-
-# Získání hodnoty z Local Storage
-auth_state = streamlit_js_eval(js_expressions="localStorage.getItem('authenticated') || 'false'", key="get_auth")
-
-# Konverze na bool
-is_authenticated = auth_state == "true"
-
-# Pokud uživatel není přihlášen
-if not is_authenticated:
-    password = st.text_input("Enter password:", type="password")
-    if st.button("Login"):
-        if password == CORRECT_PASSWORD:
-            # Uložení do Local Storage
-            streamlit_js_eval(js_expressions="localStorage.setItem('authenticated', 'true')", key="set_auth")
-            st.rerun()
-        else:
-            st.error("❌ Incorrect password!")
-
-# Pokud je přihlášený
-if is_authenticated:
-    st.success("✅ You are logged in!")
-    if st.button("Save Table"):
-        st.success("Table saved successfully!")
 
 kbc_url = url = st.secrets["kbc_url"]
 kbc_token = st.secrets["kbc_token"]
