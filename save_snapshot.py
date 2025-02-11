@@ -54,7 +54,7 @@ if st.session_state['user_name'] == None:
     if st.button("Login"):
         st.session_state['user_name'] = get_username_by_password(password_input, st.session_state['passwords'])
         if st.session_state['user_name'] != None:
-            st.write(f"Password is correct. Hello, {st.session_state['user_name']}!")
+            st.success(f"✅ Password is correct. Hi, {st.session_state['user_name']}. You are logged in!")
             st.rerun()
         else:
             st.error("Invalid password")
