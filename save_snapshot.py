@@ -73,8 +73,8 @@ st.write(f"Dataframe s daty: {df}")
 if "user_name" not in st.session_state:
     st.session_state['user_name'] = None
     
-password_input = st.text_input("Enter password:", type="password")
-
+# password_input = st.text_input("Enter password:", type="password")
+password_input = ''
 if st.button("Submit"):
     if "passwords" not in st.session_state:
         st.session_state['passwords'] = get_password_dataframe(f"in.c-reference_tables_metadata.passwords_{get_table_name_suffix()}")
