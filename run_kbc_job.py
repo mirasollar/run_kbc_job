@@ -225,6 +225,17 @@ def resetSetting():
 def toggle_downloads():
     st.session_state["show_downloads"] = not st.session_state["show_downloads"]
 
+def cast_columns(df):
+    """Ensure that columns that should be boolean are explicitly cast to boolean."""
+    for col in df.columns:
+        # If a column in the DataFrame has only True/False values, cast it to bool, NaN cast to string
+        if df[col].dropna().isin([True, False]).all() and not df[col].dropna().isin([np.nan]).all():
+            df[col] = df[col].astype(bool)
+            # df[col] = pd.Series(df[col], dtype="string")
+        elif df[col].dropna().isin([np.nan]).all():
+            df[col] = pd.Series(df[col], dtype="string")
+    return df
+
 def split_table_id(selected_table_id):
     table_id_split = selected_table_id.split('.')
     bucket_name = table_id_split[0] + '.' + table_id_split[1]
