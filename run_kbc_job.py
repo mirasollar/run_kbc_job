@@ -22,6 +22,7 @@ st.set_page_config(page_title="Keboola Data Editor", page_icon=":robot:", layout
 token = st.secrets["kbc_storage_token"]
 kbc_url = url = st.secrets["kbc_url"]
 kbc_token = st.secrets["kbc_token"]
+config_id = st.secrets["config_id"]
 LOGO_IMAGE_PATH = os.path.abspath("./app/static/keboola.png")
 
 # Initialize Client
@@ -223,55 +224,6 @@ def resetSetting():
 def toggle_downloads():
     st.session_state["show_downloads"] = not st.session_state["show_downloads"]
 
-def cast_columns(df):
-    """Ensure that columns that should be boolean are explicitly cast to boolean."""
-    for col in df.columns:
-        # If a column in the DataFrame has only True/False values, cast it to bool, NaN cast to string
-        if df[col].dropna().isin([True, False]).all() and not df[col].dropna().isin([np.nan]).all():
-            df[col] = df[col].astype(bool)
-            # df[col] = pd.Series(df[col], dtype="string")
-        elif df[col].dropna().isin([np.nan]).all():
-            df[col] = pd.Series(df[col], dtype="string")
-    return df
-        
-def get_setting(tkn, kbc_bucket_id, kbc_table_id):
-    c = Client('https://connection.eu-central-1.keboola.com', tkn)
-    description = c.tables.detail(kbc_table_id)["metadata"][0]["value"]
-    table_columns = c.tables.detail(kbc_table_id)["columns"]
-    col_metadata = c.tables.detail(kbc_table_id)["columnMetadata"]
-    primary_key = c.tables.detail(kbc_table_id)["primaryKey"]
-    if 'Upload setting' in description:
-        description = description.replace('\n','')
-        description = re.sub(r'.*Upload setting:?\s*```\{', '{', description)
-        description = re.sub(r'```.*', '', description)
-        description = re.sub(r"'", '"', description)
-        col_setting = re.sub(r"\}.*", '}', description)
-        col_setting = json.loads(col_setting)
-    else:
-        col_setting = {}
-    case_sensitive = {}
-    for col in table_columns:
-        case_sensitive[col] = ''
-        for k, v in col_metadata.items():
-            if col == k and v[0]["value"] == 'case sensitive':
-                case_sensitive[col] = v[0]["value"]
-    return col_setting, primary_key, table_columns, case_sensitive
-        
-def check_columns_diff(current_columns, file_columns):
-    missing_columns = [x for x in current_columns if x not in set(file_columns)]
-    extra_columns = [x for x in file_columns if x not in set(current_columns)]
-    return missing_columns, extra_columns
-
-def split_dict(setting_dict, n):
-    d = setting_dict.copy()
-    modified_dict = {}
-    for key, value in d.items():
-        value = re.sub(r'\s*,\s*', ',', value)
-        value_lst = value.split(",")
-        d[key] = value_lst[-n]
-        modified_dict = {k:v for k,v in d.items() if v != 'ignore'}
-    return modified_dict
-
 def split_table_id(selected_table_id):
     table_id_split = selected_table_id.split('.')
     bucket_name = table_id_split[0] + '.' + table_id_split[1]
@@ -280,15 +232,6 @@ def split_table_id(selected_table_id):
 
 def split_datetime(dt):
     return f"Date: {dt.split('T')[0]}, Time: {dt.split('T')[1]}"
-        
-def date_setting(column_setting_dict):
-    date_setting = {k: v for k, v in column_setting_dict.items() if re.search("%", v)}
-    return date_setting
-
-def check_null_rows(df_to_check):
-    col_names = df_to_check.columns.values.tolist()
-    all_col_null_check = df_to_check[col_names].isnull().apply(lambda x: all(x), axis=1)
-    return any(all_col_null_check.tolist())
 
 def create_column_config(df_to_edit):
     column_config = {}
@@ -297,88 +240,6 @@ def create_column_config(df_to_edit):
         if v == 'int64':
             column_config[k] = st.column_config.NumberColumn(format="%d")
     return column_config
-
-def check_col_types(df_to_check, col_setting):
-    col_types_dict = df_to_check.dtypes.astype(str).to_dict()
-    for x, y in col_types_dict.items():
-        if y == 'object':
-            col_types_dict.update({x: 'string'})
-        elif re.search("(int|float).*", y):
-            col_types_dict.update({x: 'number'})
-        elif y == 'bool':
-            col_types_dict.update({x: 'logical'})
-        else:
-            pass
-    dict_filter = lambda x, y: dict([ (i,x[i]) for i in x if i in set(y) ])
-    col_setting = {k: v for k, v in col_setting.items() if not re.search("%", v)}
-    wanted_keys = tuple(col_setting.keys())
-    col_types_dict = dict_filter(col_types_dict, wanted_keys)
-    wrong_columns = [k for k in col_types_dict if col_types_dict[k] != col_setting.get(k)]
-    return wrong_columns
-
-def modifying_nas(df_for_editing):
-    mod_df = df_for_editing.replace(r'^(\s*|None|none|NONE|NaN|nan|Null|null|NULL|n\/a|N\/A|<NA>)$', np.nan, regex=True)
-    return mod_df
-
-def delete_decimal_zero(df_for_editing):
-    for k, v in df_for_editing.dtypes.astype(str).to_dict().items():
-        if re.search("(int|float).*", v):
-            df_for_editing[k] = df_for_editing[k].astype(str)
-            df_for_editing[k] = df_for_editing[k].replace(r'\.0$', '', regex=True)
-    return df_for_editing
-
-def check_date_format(df_to_check, date_setting_dict):
-    col_names = df_to_check.columns.values.tolist()
-    col_names_to_check = list(set(col_names).intersection(list(date_setting_dict.keys())))
-    wrong_cols = []
-    for k, v in date_setting_dict.items():
-        for col_name in col_names_to_check:
-            if k == col_name:
-                try:
-                    df_to_check[col_name] = pd.to_datetime(df_to_check[col_name], format=v.split(",")[0])
-                    df_to_check[col_name] = df_to_check[col_name].dt.strftime(v.split(",")[0])
-                except:
-                    wrong_cols.append(k)
-    return wrong_cols, df_to_check
-
-def delete_null_rows(df_for_editing):
-    col_names = df_for_editing.columns.values.tolist()
-    # df_for_editing = df_for_editing.replace(r'^(\s*|None|none|NONE|NaN|nan|null|n\/a|N\/A)$', np.nan, regex=True)
-    df_for_editing.reset_index(drop=True, inplace=True)
-    bool_columns = []
-    for col in col_names:
-        if df_for_editing[col].dropna().isin([True, False]).all():
-            bool_columns.append(col)
-    df_without_bool = df_for_editing.drop(columns=bool_columns)
-    col_names_without_bool = df_without_bool.columns.values.tolist()
-    all_col_null_check = df_without_bool[col_names_without_bool].isnull().apply(lambda x: all(x), axis=1)
-    all_col_null_check_lst = all_col_null_check.tolist()
-    for i in range(len(all_col_null_check_lst)):
-        item = all_col_null_check_lst[i]
-        if item == True:
-            df_for_editing = df_for_editing.drop([i, i])
-    return df_for_editing
-
-def check_null_cells(df_to_check, col_setting):
-    # df_to_check = df_to_check.replace(r'^(\s*|None|none|NaN|nan|null|n\/a|N\/A)$', np.nan, regex=True)
-    df_to_check = df_to_check.astype(str)
-    wrong_cols = []
-    col_names = df_to_check.columns.values.tolist()
-    col_names_to_check = list(set(col_names).intersection(list(col_setting.keys())))
-    for i in col_names_to_check:
-        if [x for x in df_to_check[i].tolist() if re.search("^(nan|None|<NA>)$", x)]:
-            wrong_cols.append(i)
-    return wrong_cols
-
-def check_duplicates(df_to_check, cs_setting, pk_setting = []):
-    df_to_check = df_to_check.astype(str)
-    for k, v in cs_setting.items():
-        if v == '':
-            df_to_check[k] = df_to_check[k].apply(str.lower)
-    if pk_setting:
-        df_to_check = df_to_check[pk_setting]
-    duplicity_value = len(df_to_check.duplicated().unique().tolist())
-    return duplicity_value
 
 def create_table_info(json_data):
     table_id = json_data['id']
@@ -437,23 +298,39 @@ def generate_download_file(data, file_format):
     else:
         return None, None, None
     return buffer.getvalue(), mime, ext
-    
-# Protected saving & snapshoting
-def get_now_utc():
-    now_utc = datetime.datetime.now(dttimezone.utc)
-    return now_utc.strftime('%Y-%m-%d, %H:%M:%S')
 
-def get_table_name_suffix():
-    headers = st.context.headers
-    return re.sub('-', '_', headers['Host'].split('.')[0])
+def run_transformation(config_id):
+    body = {"mode":"run","component":"keboola.python-transformation-v2","config":config_id}
+    try:
+        res = requests.post('https://queue.eu-central-1.keboola.com/jobs', headers={"content-type": "application/json", "x-storageapi-token":token},
+                  json=body)
+        print(res.status_code)
+        res.raise_for_status()
+        data_json = res.json()
+        try:
+            return data_json["id"]
+        except:
+            logging.error(f"Error: {data_json}")
+    except requests.exceptions.HTTPError as e:
+        logging.error(f"HTTP Status Code: {e.response.status_code}, Message: {e}")
+    except Exception as e:
+        logging.error(f"An unexpected error has occurred (get_users): {e}")
 
-def get_password_dataframe(table_name):
-    kbc_client.tables.export_to_file(table_id = table_name, path_name='.')
-    return pd.read_csv(f"./{table_name.split('.')[2]}", low_memory=False)
 
-def get_username_by_password(password, df_passwords):
-    match = df_passwords.loc[df_passwords['password'] == password, 'name']
-    return match.iloc[0] if not match.empty else None
+def get_job_status(job_id):
+    try:
+        res = requests.get(f'https://queue.eu-central-1.keboola.com/jobs/{job_id}', headers={"content-type": "application/json", "x-storageapi-token":token})
+        print(res.status_code)
+        res.raise_for_status()
+        data_json = res.json()
+        try:
+            return data_json["status"]
+        except:
+            logging.error(f"Error: {data_json}")
+    except requests.exceptions.HTTPError as e:
+        logging.error(f"HTTP Status Code: {e.response.status_code}, Message: {e}")
+    except Exception as e:
+        logging.error(f"An unexpected error has occurred (get_users): {e}")
         
 # Display tables
 init()
@@ -579,6 +456,26 @@ elif st.session_state['selected-table'] is not None:
 elif st.session_state['upload-tables']:
     if st.button(":gray[:arrow_left: Go back]", on_click=on_click_back):
         pass
+
+    st.title("Status dat")
+
+    if st.button("Aktualizovat"):
+        with st.spinner("Aktualizuji data..."):
+            job_id = run_transformation(config_id)
+            status = 'processing'
+            with st.empty():
+                while status == 'processing' or status == 'created':
+                    status = get_job_status(job_id)
+                    st.markdown("🔄 Čekám na dokončení...")
+                    time.sleep(2)
+    
+        if status == 'success':
+            msg_placeholder = st.empty()
+            msg_placeholder.success("✅ Data jsou nyní aktuální")
+            time.sleep(5)
+            msg_placeholder.empty()
+            st.rerun()
+
         
     # Po uložení se resetuje stav save_requested, aby se neukládalo znovu
     # st.session_state["save_requested"] = False
