@@ -93,7 +93,7 @@ def update_session_state(table_id):
 def display_table_card(row):
     card(
         title=row["displayName"],
-        text=[f"Table ID: {row['table_id']}"],
+        text=[f"Table ID: {row['table_id']}", f"Updated at: {split_datetime(row['lastImportDate'])}"],
         styles={
             "card": {
                 "width": "100%",
