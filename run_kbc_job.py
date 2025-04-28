@@ -446,21 +446,21 @@ elif st.session_state['run_job']:
     if st.button(":gray[:arrow_left: Go back]", on_click=on_click_back):
         pass
 
-    st.title("Aktualizace dat")
+    st.title("Update data")
 
-    if st.button("Aktualizovat"):
-        with st.spinner("Aktualizuji data..."):
+    if st.button("Update"):
+        with st.spinner("Updating data..."):
             job_id = run_transformation(config_id)
             status = 'processing'
             with st.empty():
                 while status == 'processing' or status == 'created':
                     status = get_job_status(job_id)
-                    st.markdown("🔄 Čekám na dokončení...")
+                    st.markdown("🔄 Waiting for completion...")
                     time.sleep(2)
                     
         if status == 'success':
             msg_placeholder = st.empty()
-            msg_placeholder.success("✅ Data jsou nyní aktuální")
+            msg_placeholder.success("✅ Data is now up to date")
             time.sleep(5)
             msg_placeholder.empty()
             st.session_state['run_job'] = False
@@ -469,6 +469,6 @@ elif st.session_state['run_job']:
 
         if status == 'error' or status == 'warning':
             msg_placeholder = st.empty()
-            msg_placeholder.error("🚨 Výpočet skončil chybou. Kontaktujte podporu (miroslav.sollar@firma.seznam.cz).")
+            msg_placeholder.error("🚨 The update ended with an error. Contact support: (miroslav.sollar@firma.seznam.cz).")
 
 display_footer_section()
