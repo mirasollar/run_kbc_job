@@ -480,6 +480,7 @@ elif st.session_state['upload-tables']:
                     status = get_job_status(job_id)
                     st.markdown("🔄 Čekám na dokončení...")
                     time.sleep(2)
+                    
     
         if status == 'success':
             msg_placeholder = st.empty()
@@ -487,6 +488,10 @@ elif st.session_state['upload-tables']:
             time.sleep(5)
             msg_placeholder.empty()
             st.rerun()
+
+        if status == 'error' or status == 'warning':
+            msg_placeholder = st.empty()
+            msg_placeholder.error("🚨 Výpočet skončil chybou. Kontaktujte podporu (miroslav.sollar@firma.seznam.cz)")
 
         
     # Po uložení se resetuje stav save_requested, aby se neukládalo znovu
