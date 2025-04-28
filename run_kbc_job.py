@@ -260,32 +260,11 @@ def create_column_config(df_to_edit):
 def create_table_info(json_data):
     table_id = json_data['id']
     display_name = json_data['displayName']
-    primary_key = ', '.join(json_data['primaryKey'])
     last_import_date = json_data['lastImportDate']
-    rows_count = json_data['rowsCount']
-    created = json_data['created']
-    # description - KBC.description
-    description = ''
-    for item in json_data['metadata']:
-        if item['key'] == 'KBC.description':         
-            table_setting_str_dict = re.sub("'", '"', re.sub(r'```.*', '', re.sub(r'.*Upload setting:?\s*```\{', '{', item['value'])))
-            description = ', '.join(f"*{key}*: {value}" for key, value in json.loads(table_setting_str_dict).items())
-            break
-    # key (column name) if "case sensitive"
-    case_sensitive_columns = []
-    for column, metadata_list in json_data['columnMetadata'].items():
-        for metadata in metadata_list:
-            if metadata['value'] == 'case sensitive':
-                case_sensitive_columns.append(column)
     data = {
         'table_id': [table_id],
         'displayName': [display_name],
-        'primaryKey': [primary_key],
         'lastImportDate': [last_import_date],
-        'rowsCount': [rows_count],
-        'created': [created],
-        'description': [description],
-        'case_sensitive_columns': [case_sensitive_columns]
     }
     df = pd.DataFrame(data)
     return df
@@ -371,7 +350,7 @@ if st.session_state['selected-table'] is None and (st.session_state['run_job'] i
 
     #Keboola title
     st.markdown("""<h1><span style="color:#1F8FFF;">Keboola</span> Data Editor</h1>""", unsafe_allow_html=True)
-    st.info('Select the table you want to edit. If the data is not up-to-data, click on the Reload Data button.', icon="ℹ️")
+    st.info('Select the table you want to view.', icon="ℹ️")
 
     # Title of the Streamlit app
     st.subheader("Tables")
@@ -379,10 +358,10 @@ if st.session_state['selected-table'] is None and (st.session_state['run_job'] i
     # Search bar and sorting options
     search_col, sort_col, but_col1, col_upload = st.columns((50,25,10,15))
 
-    with but_col1:
-        if st.button("Reload Data", key="reload-tables", use_container_width = True, type="secondary"):
-            st.session_state["tables_id"] = fetch_all_ids()
-            st.toast('Tables List Reloaded!', icon = "✅")
+    # with but_col1:
+    #     if st.button("Reload Data", key="reload-tables", use_container_width = True, type="secondary"):
+    #         st.session_state["tables_id"] = fetch_all_ids()
+    #         st.toast('Tables List Reloaded!', icon = "✅")
 
     with search_col:
         search_query = st.text_input("Search for table", placeholder="Table Search",label_visibility="collapsed")
@@ -422,7 +401,7 @@ elif st.session_state['selected-table'] is not None:
     st.title("Data Editor")
   
     # Info
-    st.info('After clicking the Save Data button, the data will be sent to Keboola Storage using a FULL LOAD.', icon="ℹ️")
+    st.info('After clicking on download data, you will see the option to download data in XLSX, TSV and CSV.', icon="ℹ️")
 
     #Select Box
     option = st.selectbox("Select Table", st.session_state["tables_id"], index=None, placeholder="Select table",label_visibility="collapsed")
@@ -438,14 +417,7 @@ elif st.session_state['selected-table'] is not None:
         # Convert the row to a Series to facilitate access
         selected_row = selected_row.iloc[0]
         st.markdown(f"**Table ID:** {selected_row['table_id']}")
-        st.markdown(f"**Created at:** {split_datetime(selected_row['created'])}")
         st.markdown(f"**Updated at:** {split_datetime(selected_row['lastImportDate'])}")
-        st.markdown(f"**Primary Key:** {selected_row.get('primaryKey', 'N/A')}")
-        st.markdown(f"**Table Setting:** {selected_row['description']}")
-        case_sensitive_columns = selected_row['case_sensitive_columns']
-        if case_sensitive_columns:
-            st.markdown(f"**Case Sensitive Columns:** {', '.join(case_sensitive_columns)}")
-        st.markdown(f"**Rows Count:** {selected_row['rowsCount']}")
 
     st.button("Download Data", on_click=toggle_downloads, help="Click to show download options")
 
