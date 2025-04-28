@@ -65,9 +65,6 @@ def get_dataframe(table_name):
 def init():
     if 'selected-table' not in st.session_state:
         st.session_state['selected-table'] = None
-        
-    if "uploaded_table_id" not in st.session_state:
-        st.session_state["uploaded_table_id"] = None
 
     if 'tables_id' not in st.session_state:
         st.session_state['tables_id'] = pd.DataFrame(columns=['table_id'])
@@ -77,9 +74,6 @@ def init():
 
     if "edited_data" not in st.session_state:
         st.session_state["edited_data"] = None 
-
-    if 'upload-tables' not in st.session_state:
-        st.session_state["upload-tables"] = False
     
     if "show_downloads" not in st.session_state:
         st.session_state["show_downloads"] = False
@@ -170,7 +164,7 @@ def fetch_all_ids():
     return df
 
 # Definujte callback funkci pro tlačítko
-def on_click_uploads():
+def on_click_update_data():
     st.session_state["run_job"] = True
 
 # Definujte callback funkci pro tlačítko
@@ -386,7 +380,7 @@ if st.session_state['selected-table'] is None and (st.session_state['run_job'] i
         sort_option = st.selectbox("Sort By Name", ["Sort By Name", "Sort By Date Created", "Sort By Date Updated"],label_visibility="collapsed")
     
     with col_upload:
-        if st.button("Upload Data", on_click=on_click_uploads, use_container_width = True):
+        if st.button("Update Data", on_click=on_click_udate_data, use_container_width = True):
             pass
 
     # Filtrace dat podle vyhledávacího dotazu
