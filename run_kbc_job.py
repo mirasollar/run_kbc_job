@@ -380,7 +380,7 @@ if st.session_state['selected-table'] is None and (st.session_state['run_job'] i
         sort_option = st.selectbox("Sort By Name", ["Sort By Name", "Sort By Date Created", "Sort By Date Updated"],label_visibility="collapsed")
     
     with col_upload:
-        if st.button("Update Data", on_click=on_click_udate_data, use_container_width = True):
+        if st.button("Update Data", on_click=on_click_update_data, use_container_width = True):
             pass
 
     # Filtrace dat podle vyhledávacího dotazu
