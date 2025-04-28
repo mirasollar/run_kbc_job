@@ -91,13 +91,23 @@ def update_session_state(table_id):
     st.rerun()
      
 def display_table_card(row):
+    today = datetime.date.today().isoformat()
+    last_import_date_time = row['lastImportDate']
+    last_import_date = last_import_date_time.split('T')[0]
+
+    # Vyber emoji podle stavu
+    if last_import_date == today:
+        status_dot = "🟢"  # zelené kolečko
+    else:
+        status_dot = "🔴"  # červené kolečko
+
     card(
-        title=row["displayName"],
-        text=[f"Table ID: {row['table_id']}", f"Updated at: {split_datetime(row['lastImportDate'])}"],
+        title=f"{status_dot} {row['displayName']}",  # Přidám kolečko před název
+        text=[f"Table ID: {row['table_id']}", f"Updated at: {last_import_date}"],
         styles={
             "card": {
                 "width": "100%",
-                "height": "80px",
+                "height": "100px",
                 "box-shadow": "2px 2px 12px rgba(0,0,0,0.1)",
                 "margin": "0px",
                 "flex-direction": "column",  # Stack children vertically
@@ -106,26 +116,26 @@ def display_table_card(row):
             "filter": {
                 "background-color": "#FFFFFF"
             },
-        "div": {
-            "padding":"0px",
-            "display": "flex",
-            "align-items": "flex-start", 
-        },
-         "text": {
+            "div": {
+                "padding": "0px",
+                "display": "flex",
+                "align-items": "flex-start",
+            },
+            "text": {
                 "color": "#999A9F",
-                "padding-left":"5%",
+                "padding-left": "5%",
                 "align-self": "flex-start",
                 "font-size": "15px",
                 "font-weight": "lighter",
             },
-         "title": {
+            "title": {
                 "font-size": "24px",
                 "color": "#1F8FFF",
-                "padding-left":"5%",
-                "align-self": "flex-start",}
-        
+                "padding-left": "5%",
+                "align-self": "flex-start",
+            }
         },
-        image="https://upload.wikimedia.org/wikipedia/en/4/48/Blank.JPG" ,
+        image="https://upload.wikimedia.org/wikipedia/en/4/48/Blank.JPG",
         key=row['table_id'],
         on_click=lambda table_id=row['table_id']: update_session_state(table_id)
     )
