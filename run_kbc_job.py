@@ -487,20 +487,14 @@ elif st.session_state['upload-tables']:
             msg_placeholder.success("✅ Data jsou nyní aktuální")
             time.sleep(5)
             msg_placeholder.empty()
+            st.session_state['upload-tables'] = False
+            st.session_state['selected-table'] = st.session_state["uploaded_table_id"]
+            st.session_state["uploaded_table_id"] = None
+            st.cache_data.clear()
             st.rerun()
 
         if status == 'error' or status == 'warning':
             msg_placeholder = st.empty()
-            msg_placeholder.error("🚨 Výpočet skončil chybou. Kontaktujte podporu (miroslav.sollar@firma.seznam.cz)")
-
-        
-    # Po uložení se resetuje stav save_requested, aby se neukládalo znovu
-    # st.session_state["save_requested"] = False
-    # st.session_state['upload-tables'] = False
-    # st.session_state['selected-table'] = st.session_state["uploaded_table_id"]
-    # st.session_state["uploaded_table_id"] = None
-    # st.cache_data.clear()
-    # time.sleep(3)
-    # st.rerun()
+            msg_placeholder.error("🚨 Výpočet skončil chybou. Kontaktujte podporu (miroslav.sollar@firma.seznam.cz).")
 
 display_footer_section()
