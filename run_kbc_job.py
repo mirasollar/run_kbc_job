@@ -281,9 +281,10 @@ def create_table_info(json_data):
     return df
 
 def prepare_downloaded_data():
-    downloaded_data = cast_columns(st.session_state['data'])
-    downloaded_data = delete_null_rows(modifying_nas(downloaded_data))
-    downloaded_data = delete_decimal_zero(downloaded_data)
+    downloaded_data = st.session_state['data']
+    # downloaded_data = cast_columns(st.session_state['data'])
+    # downloaded_data = modifying_nas(downloaded_data)
+    # downloaded_data = delete_decimal_zero(downloaded_data)
     return downloaded_data
 
 def generate_download_file(data, file_format):
