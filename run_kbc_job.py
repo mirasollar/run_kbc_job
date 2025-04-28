@@ -87,8 +87,8 @@ def init():
     if "user_name" not in st.session_state:
         st.session_state['user_name'] = None
     
-    if "save_requested" not in st.session_state:
-        st.session_state["save_requested"] = False
+    if "run_job" not in st.session_state:
+        st.session_state["run_job"] = False
 
 def update_session_state(table_id):
     with st.spinner('Loading ...'):
@@ -171,11 +171,11 @@ def fetch_all_ids():
 
 # Definujte callback funkci pro tlačítko
 def on_click_uploads():
-    st.session_state["upload-tables"] = True
+    st.session_state["run_job"] = True
 
 # Definujte callback funkci pro tlačítko
 def on_click_back():
-    st.session_state["upload-tables"] = False
+    st.session_state["run_job"] = False
 
 # Function to display a table section
 # table_name, table_id ,updated,created
@@ -348,7 +348,7 @@ def get_job_status(job_id):
 init()
 st.session_state["tables_id"] = fetch_all_ids()
 
-if st.session_state['selected-table'] is None and (st.session_state['upload-tables'] is None or st.session_state['upload-tables'] == False):
+if st.session_state['selected-table'] is None and (st.session_state['run_job'] is None or st.session_state['run_job'] == False):
     #LOGO
       # Place an image in the first column
     col1, col2, col3 = st.columns((1,7,2))
@@ -465,11 +465,11 @@ elif st.session_state['selected-table'] is not None:
                                  column_config=create_column_config(st.session_state['data']))
 
     ChangeButtonColour('Save Data', '#FFFFFF', '#1EC71E','#1EC71E')
-elif st.session_state['upload-tables']:
+elif st.session_state['run_job']:
     if st.button(":gray[:arrow_left: Go back]", on_click=on_click_back):
         pass
 
-    st.title("Status dat")
+    st.title("Aktualizace dat")
 
     if st.button("Aktualizovat"):
         with st.spinner("Aktualizuji data..."):
@@ -481,15 +481,12 @@ elif st.session_state['upload-tables']:
                     st.markdown("🔄 Čekám na dokončení...")
                     time.sleep(2)
                     
-    
         if status == 'success':
             msg_placeholder = st.empty()
             msg_placeholder.success("✅ Data jsou nyní aktuální")
             time.sleep(5)
             msg_placeholder.empty()
-            st.session_state['upload-tables'] = False
-            st.session_state['selected-table'] = st.session_state["uploaded_table_id"]
-            st.session_state["uploaded_table_id"] = None
+            st.session_state['run_job'] = False
             st.cache_data.clear()
             st.rerun()
 
