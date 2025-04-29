@@ -94,9 +94,10 @@ def display_table_card(row):
     today = datetime.date.today().isoformat()
     last_import_date_time = row['lastImportDate']
     last_import_date = last_import_date_time.split('T')[0]
+    last_import_date_dt = datetime.date.fromisoformat(last_import_date)
 
     # Spočítat rozdíl ve dnech
-    days_diff = (today - last_import_date).days
+    days_diff = (today - last_import_date_dt).days
 
     # Připravit text pro tooltip
     if days_diff == 0:
