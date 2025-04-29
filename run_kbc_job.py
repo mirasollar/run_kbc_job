@@ -91,11 +91,11 @@ def update_session_state(table_id):
     st.rerun()
      
 def display_table_card(row):
-    today = datetime.date.today().isoformat()
+    today = datetime.date.today()
     st.write(f"last_import_date_dt: {today}")
     last_import_date_time = row['lastImportDate']
     last_import_date = last_import_date_time.split('T')[0]
-    last_import_date_dt = datetime.date.fromisoformat(last_import_date)
+    last_import_date_dt = datetime.datetime.strptime(last_import_date, '%Y-%m-%d').date()
     st.write(f"last_import_date_dt: {last_import_date_dt}")
 
     # Spočítat rozdíl ve dnech
