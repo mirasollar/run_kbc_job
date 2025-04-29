@@ -95,14 +95,36 @@ def display_table_card(row):
     last_import_date_time = row['lastImportDate']
     last_import_date = last_import_date_time.split('T')[0]
 
-    # Vyber emoji podle stavu
-    if last_import_date == today:
-        status_dot = "🟢"  # zelené kolečko
+    # Spočítat rozdíl ve dnech
+    days_diff = (today - last_import_date).days
+
+    # Připravit text pro tooltip
+    if days_diff == 0:
+        tooltip_text = "Updated today"
+        circle_color = "#00C853"  # zelená
+    elif days_diff == 1:
+        tooltip_text = f"Updated {days_diff} day ago"
+        circle_color = "#D50000"  # červená
     else:
-        status_dot = "🔴"  # červené kolečko
+        tooltip_text = f"Updated {days_diff} days ago"
+        circle_color = "#D50000"  # červená
+
+    # HTML pro barevné kolečko
+    status_dot_html = f'''
+        <div title="{tooltip_text}" style="
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: {circle_color};
+            margin-right: 8px;
+            vertical-align: middle;
+            cursor: help;
+        "></div>
+    '''
 
     card(
-        title=f"{status_dot} {row['displayName']}",  # Přidám kolečko před název
+        title=f"{status_dot_html}{row['displayName']}",  # Kolečko + název
         text=[f"Table ID: {row['table_id']}", f"Updated at: {last_import_date}"],
         styles={
             "card": {
@@ -110,7 +132,7 @@ def display_table_card(row):
                 "height": "100px",
                 "box-shadow": "2px 2px 12px rgba(0,0,0,0.1)",
                 "margin": "0px",
-                "flex-direction": "column",  # Stack children vertically
+                "flex-direction": "column",
                 "align-items": "flex-start",
             },
             "filter": {
@@ -137,7 +159,8 @@ def display_table_card(row):
         },
         image="https://upload.wikimedia.org/wikipedia/en/4/48/Blank.JPG",
         key=row['table_id'],
-        on_click=lambda table_id=row['table_id']: update_session_state(table_id)
+        on_click=lambda table_id=row['table_id']: update_session_state(table_id),
+        unsafe_allow_html=True,  # Důležité! Povolit HTML v title
     )
 
 def ChangeButtonColour(widget_label, font_color, background_color, border_color):
