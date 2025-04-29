@@ -91,42 +91,18 @@ def update_session_state(table_id):
     st.rerun()
      
 def display_table_card(row):
-    today = datetime.date.today()
+    today = datetime.date.today().isoformat()
     last_import_date_time = row['lastImportDate']
     last_import_date = last_import_date_time.split('T')[0]
-    last_import_date_dt = datetime.datetime.strptime(last_import_date, '%Y-%m-%d').date()
-    st.write(f"last_import_date_dt: {last_import_date_dt}")
 
-    # Spočítat rozdíl ve dnech
-    days_diff = (today - last_import_date_dt).days
-
-    # Připravit text pro tooltip
-    if days_diff == 0:
-        tooltip_text = "Updated today"
-        circle_color = "#00C853"  # zelená
-    elif days_diff == 1:
-        tooltip_text = f"Updated {days_diff} day ago"
-        circle_color = "#D50000"  # červená
+    # Vyber emoji podle stavu
+    if last_import_date == today:
+        status_dot = "🟢"  # zelené kolečko
     else:
-        tooltip_text = f"Updated {days_diff} days ago"
-        circle_color = "#D50000"  # červená
-
-    # HTML pro barevné kolečko
-    status_dot_html = f'''
-        <div title="{tooltip_text}" style="
-            display: inline-block;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background-color: {circle_color};
-            margin-right: 8px;
-            vertical-align: middle;
-            cursor: help;
-        "></div>
-    '''
+        status_dot = "🔴"  # červené kolečko
 
     card(
-        title=f"{status_dot_html}{row['displayName']}",  # Kolečko + název
+        title=f"{status_dot} {row['displayName']}",  # Přidám kolečko před název
         text=[f"Table ID: {row['table_id']}", f"Updated at: {last_import_date}"],
         styles={
             "card": {
@@ -134,7 +110,7 @@ def display_table_card(row):
                 "height": "100px",
                 "box-shadow": "2px 2px 12px rgba(0,0,0,0.1)",
                 "margin": "0px",
-                "flex-direction": "column",
+                "flex-direction": "column",  # Stack children vertically
                 "align-items": "flex-start",
             },
             "filter": {
@@ -161,8 +137,7 @@ def display_table_card(row):
         },
         image="https://upload.wikimedia.org/wikipedia/en/4/48/Blank.JPG",
         key=row['table_id'],
-        on_click=lambda table_id=row['table_id']: update_session_state(table_id),
-        unsafe_allow_html=True,  # Důležité! Povolit HTML v title
+        on_click=lambda table_id=row['table_id']: update_session_state(table_id)
     )
 
 def ChangeButtonColour(widget_label, font_color, background_color, border_color):
